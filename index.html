@@ -152,13 +152,20 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
     <div class="inp-grid" style="grid-template-columns:1fr 1fr;margin-bottom:16px">
       <div class="inp-item">
         <label>Saldo Conto Corrente oggi (&euro;)</label>
-        <input type="number" id="saldoCC" class="inp-m" step="0.01" oninput="salvaCalc()">
-        <span class="nota">Aggiornare con il saldo BPER del giorno</span>
+        <div class="infl-box" style="background:var(--giallo);border-color:#D4A000;min-height:92px">
+          <div class="infl-etichetta" style="color:#7B6A00">&#9998; Aggiornamento manuale</div>
+          <input type="number" id="saldoCC" step="0.01" oninput="salvaCalc()"
+            style="font-size:22px;font-weight:bold;color:var(--testo);border:none;background:transparent;width:100%;text-align:right;padding:4px 0;font-family:Arial;min-height:auto;margin-top:2px">
+          <div style="font-size:11px;color:#7B6A00;margin-top:3px">BPER Deposito Titoli 23036609</div>
+        </div>
       </div>
       <div class="inp-item">
-        <label style="color:var(--verde)">&#8594; Base Spese Annue (da Appartamenti)</label>
-        <div class="calc-val" id="baseSpeseCalc">0 &euro;</div>
-        <span class="nota">Somma automatica dalla sezione 4 &mdash; Appartamenti</span>
+        <label style="color:var(--verde)">&#8594; Base Spese Annue</label>
+        <div class="infl-box" style="background:var(--verde-bg);border-color:var(--verde-bd);min-height:92px">
+          <div class="infl-etichetta" style="color:#155724">&#128260; Aggiornamento automatico</div>
+          <div id="baseSpeseCalc" style="font-size:22px;font-weight:bold;color:var(--verde);text-align:right;margin-top:2px">0 &euro;</div>
+          <div style="font-size:11px;color:#388E3C;margin-top:3px">fonte: tabelle inserimento spese</div>
+        </div>
       </div>
     </div>
     <div class="inp-grid" style="grid-template-columns:1fr 1fr 1fr">
@@ -169,17 +176,22 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
           <div class="infl-val" id="infl-val">&#8230;</div>
           <div class="infl-note" id="infl-note">Caricamento in corso</div>
         </div>
-        <span class="nota">Aggiornata ad ogni clic su &ldquo;Aggiorna Prezzi e Inflazione&rdquo;</span>
       </div>
       <div class="inp-item">
         <label style="color:var(--blu-md)">&#8594; Componente Inflazione sul Patrimonio</label>
-        <div class="calc-val blu" id="compInfl">0 &euro;</div>
-        <span class="nota">Patrimonio totale &times; Inflazione%</span>
+        <div class="infl-box" style="background:var(--blu-bg);border-color:var(--blu-md)">
+          <div class="infl-etichetta" style="color:#2E74B5">&#128260; Aggiornamento automatico</div>
+          <div id="compInfl" style="font-size:22px;font-weight:bold;color:var(--blu-md);text-align:right;margin-top:2px">0 &euro;</div>
+          <div style="font-size:11px;color:#5a8fc4;margin-top:3px">Patrimonio totale &times; Inflazione%</div>
+        </div>
       </div>
       <div class="inp-item">
-        <label style="color:var(--verde)">&#8594; Target Rendita (Spese + Inflazione Patrimonio)</label>
-        <div class="calc-val" id="targetCalc">0 &euro;</div>
-        <span class="nota">Obiettivo pieno: copre spese e protegge dall&rsquo;inflazione</span>
+        <label style="color:var(--verde)">&#8594; Target Rendita (Spese + Inflazione)</label>
+        <div class="infl-box" style="background:var(--verde-bg);border-color:var(--verde-bd)">
+          <div class="infl-etichetta" style="color:#155724">&#128260; Aggiornamento automatico</div>
+          <div id="targetCalc" style="font-size:22px;font-weight:bold;color:var(--verde);text-align:right;margin-top:2px">0 &euro;</div>
+          <div style="font-size:11px;margin-top:3px" id="targetStatus">&nbsp;</div>
+        </div>
       </div>
     </div>
   </div>
@@ -260,6 +272,7 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
       <div class="kpi-box yl"><div class="kpi-lbl">Target Rendita (Spese + Infl.)</div><div class="kpi-val" id="k-tar">&mdash;</div></div>
       <div class="kpi-box" id="kb-sco"><div class="kpi-lbl">Scostamento da Target</div><div class="kpi-val" id="k-sco">&mdash;</div></div>
       <div class="kpi-box" id="kb-cov"><div class="kpi-lbl">Copertura Spese %</div><div class="kpi-val" id="k-cov">&mdash;</div><div class="kpi-sub">obiettivo: &gt;100%</div></div>
+      <div class="kpi-box" id="kb-fullcov"><div class="kpi-lbl">Obiettivo Pieno (Spese + Infl.)</div><div class="kpi-val" id="k-fullcov">&mdash;</div><div class="kpi-sub" id="k-fullcov-sub">&nbsp;</div></div>
     </div>
     <div class="semaforo nd" id="sem1"><span class="sem-ico" id="si1">&#8987;</span><span id="st1">Calcolo in corso&hellip;</span></div>
   </div>
@@ -513,11 +526,17 @@ function rdInflBox(){
 function rdManuali(){
   document.getElementById('saldoCC').value=D.saldoCC;
   const sp=totSpese().n;
-  document.getElementById('baseSpeseCalc').textContent=sp>0?eI(sp):'0 € — inserire le spese nella sezione Appartamenti';
+  document.getElementById('baseSpeseCalc').textContent=sp>0?eI(sp):'0 €';
   document.getElementById('compInfl').textContent=eI(compInfl());
   document.getElementById('targetCalc').textContent=eI(targetR());
   document.getElementById('ts-ult').textContent=D.tsAggiornamento||'mai aggiornato';
   rdInflBox();
+  const ren=renditaN(),tar=targetR(),ts=document.getElementById('targetStatus');
+  if(ts){
+    if(tar===0){ts.textContent=' ';ts.style.color=''}
+    else if(ren>=tar){ts.textContent='✓ Obiettivo raggiunto';ts.style.color='#155724';ts.style.fontWeight='bold'}
+    else{ts.textContent='⚠️ Obiettivo non raggiunto';ts.style.color='#C00000';ts.style.fontWeight='bold'}
+  }
 }
 
 function rdTitoli(){
@@ -610,6 +629,11 @@ function rdRiep(){
   const ce=document.getElementById('k-cov'),cb=document.getElementById('kb-cov');
   ce.textContent=eP(cov,1);ce.className='kpi-val '+(cov>=100?'vd':'rs');
   cb.className='kpi-box '+(cov>=100?'vd':'rs');
+  const fullGap=tar-ren;
+  const kfc=document.getElementById('k-fullcov'),kfcb=document.getElementById('kb-fullcov'),kfcs=document.getElementById('k-fullcov-sub');
+  if(sp===0){kfc.textContent='—';kfc.className='kpi-val';kfcb.className='kpi-box';if(kfcs)kfcs.textContent=' '}
+  else if(fullGap<=0){kfc.textContent='✓ Raggiunto';kfc.className='kpi-val vd';kfcb.className='kpi-box vd';if(kfcs)kfcs.textContent='spese + inflazione coperte'}
+  else{kfc.textContent='−'+eI(fullGap);kfc.className='kpi-val rs';kfcb.className='kpi-box rs';if(kfcs)kfcs.textContent='mancano al target pieno'}
   const s1=document.getElementById('sem1'),i1=document.getElementById('si1'),t1=document.getElementById('st1');
   if(ren>=sp){s1.className='semaforo si';i1.textContent='✅';t1.textContent='SPESE COPERTE — La rendita supera le spese di '+eI(sco)+(ren>=tar?' · copre anche la quota inflazione':' · non copre ancora la quota inflazione ('+eI(ren-tar)+')')}
   else{s1.className='semaforo no';i1.textContent='⚠️';t1.textContent=`RENDITA INSUFFICIENTE — Mancano ${eI(Math.abs(sco))} per coprire le spese`}
