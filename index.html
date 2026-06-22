@@ -171,7 +171,7 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
     <div class="inp-grid" style="grid-template-columns:1fr 1fr 1fr">
       <div class="inp-item">
         <label style="color:var(--verde)">Inflazione IPCA Italia &mdash; Fonte: BCE</label>
-        <div class="infl-box" id="infl-box">
+        <div class="infl-box" id="infl-box" style="min-height:92px">
           <div class="infl-etichetta">&#128260; Aggiornamento automatico</div>
           <div class="infl-val" id="infl-val">&#8230;</div>
           <div class="infl-note" id="infl-note">Caricamento in corso</div>
@@ -179,7 +179,7 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
       </div>
       <div class="inp-item">
         <label style="color:var(--blu-md)">&#8594; Componente Inflazione sul Patrimonio</label>
-        <div class="infl-box" style="background:var(--blu-bg);border-color:var(--blu-md)">
+        <div class="infl-box" style="background:var(--blu-bg);border-color:var(--blu-md);min-height:92px">
           <div class="infl-etichetta" style="color:#2E74B5">&#128260; Aggiornamento automatico</div>
           <div id="compInfl" style="font-size:22px;font-weight:bold;color:var(--blu-md);text-align:right;margin-top:2px">0 &euro;</div>
           <div style="font-size:11px;color:#5a8fc4;margin-top:3px">Patrimonio totale &times; Inflazione%</div>
@@ -187,7 +187,7 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
       </div>
       <div class="inp-item">
         <label style="color:var(--verde)">&#8594; Target Rendita (Spese + Inflazione)</label>
-        <div class="infl-box" style="background:var(--verde-bg);border-color:var(--verde-bd)">
+        <div class="infl-box" style="background:var(--verde-bg);border-color:var(--verde-bd);min-height:92px">
           <div class="infl-etichetta" style="color:#155724">&#128260; Aggiornamento automatico</div>
           <div id="targetCalc" style="font-size:22px;font-weight:bold;color:var(--verde);text-align:right;margin-top:2px">0 &euro;</div>
           <div style="font-size:11px;margin-top:3px" id="targetStatus">&nbsp;</div>
@@ -372,22 +372,22 @@ function applicaDati(p){
 
 function carica(){
   try{
-    // Prova prima URL hash (link condiviso)
     if(window.location.hash&&window.location.hash.length>10){
       try{
         const enc=window.location.hash.slice(1);
         const p=JSON.parse(decodeURIComponent(escape(atob(enc))));
         applicaDati(p);
         history.replaceState(null,'',window.location.pathname+window.location.search);
-        return;
+        return true;
       }catch(e){}
     }
-    // Poi localStorage v5, poi migrazione da v4
     let s=localStorage.getItem('biper_v5');
     if(!s)s=localStorage.getItem('biper_v4');
-    if(!s)return;
+    if(!s)return false;
     applicaDati(JSON.parse(s));
+    return true;
   }catch(e){}
+  return false;
 }
 
 /* ── EXPORT / IMPORT / SHARE ── */
@@ -811,21 +811,24 @@ async function aggiornaTutto(){
 
 (async function init(){
   // 1. Carica subito da localStorage (istantaneo)
-  carica();rdAll();
+  const hasLocalData=carica();rdAll();
   // 2. Confronta con GitHub — usa la versione più recente
+  // Se non c'è localStorage (primo accesso da nuovo dispositivo) → usa sempre GitHub
+  // Se c'è localStorage → confronta timestamp, vince il più recente
   try{
     syncStatus('⏳ GitHub…');
     const resp=await fetch(GH_RAW+'?ts='+Date.now(),{signal:AbortSignal.timeout(8000)});
     if(resp.ok){
       const ghD=await resp.json();
       const ghTs=ghD._saved||0,lcTs=D._saved||0;
-      if(ghTs>lcTs){
+      if(!hasLocalData||ghTs>lcTs){
+        // Nuovo dispositivo senza dati locali, oppure GitHub è più aggiornato
         applicaDati(ghD);salva_locale();rdAll();
         syncStatus('✓ Dati da GitHub','#90EE90');
-      }else if(lcTs>ghTs){
-        syncStatus('⏳ Prima sync locale→GitHub…');
+      }else{
+        // Dati locali uguali o più recenti → carica su GitHub
         await salvasuGitHub();
-      }else{syncStatus('✓ Sincronizzato','#90EE90')}
+      }
     }else if(resp.status===404){
       syncStatus('⏳ Carico su GitHub…');
       await salvasuGitHub();
