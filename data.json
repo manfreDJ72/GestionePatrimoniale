@@ -1,0 +1,33 @@
+{
+  "saldoCC": 128957.56,
+  "certificate": 50000,
+  "baseSpese": 32000,
+  "inflazione": 1.2,
+  "inflazione_periodo": "2025-12",
+  "inflazione_ts": "2026-06-22T14:38:34.200Z",
+  "prezzi": {},
+  "valMkt": {},
+  "prezziPrec": {},
+  "valMktPrec": {},
+  "tsAggiornamento": null,
+  "customTitoli": [],
+  "esclusi": {},
+  "apt": [
+    {
+      "nome": "Via Correggio — Secondo Piano",
+      "tipo": "apt",
+      "spese": []
+    },
+    {
+      "nome": "Casa Courmayeur",
+      "tipo": "apt",
+      "spese": []
+    },
+    {
+      "nome": "Spese Generali",
+      "tipo": "gen",
+      "spese": []
+    }
+  ],
+  "_saved": 1782139114200
+}
