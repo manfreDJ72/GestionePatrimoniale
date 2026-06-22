@@ -1,33 +1,201 @@
 {
-  "saldoCC": 0,
+  "saldoCC": 128957.56,
   "certificate": 50000,
   "baseSpese": 32000,
   "inflazione": 1.2,
   "inflazione_periodo": "2025-12",
-  "inflazione_ts": "2026-06-22T14:38:48.116Z",
+  "inflazione_ts": "2026-06-15T16:06:52.629Z",
   "prezzi": {},
   "valMkt": {},
-  "prezziPrec": {},
-  "valMktPrec": {},
-  "tsAggiornamento": null,
+  "prezziPrec": {
+    "t1": 94.11,
+    "t2": 101.77,
+    "t3": 102.32,
+    "t4": 101.17
+  },
+  "valMktPrec": {
+    "t5": 199827.65,
+    "t6": 100000,
+    "t7": 150000,
+    "t8": 50000,
+    "t9": 100000
+  },
+  "tsAggiornamento": "15/06/2026, 18:07",
   "customTitoli": [],
   "esclusi": {},
   "apt": [
     {
       "nome": "Via Correggio — Secondo Piano",
       "tipo": "apt",
-      "spese": []
+      "spese": [
+        {
+          "et": "Condominio",
+          "vo": "",
+          "l": 6000,
+          "n": 6000,
+          "no": ""
+        },
+        {
+          "et": "Box",
+          "vo": "",
+          "l": 1200,
+          "n": 1200,
+          "no": ""
+        },
+        {
+          "et": "Luce e Gas",
+          "vo": "",
+          "l": 2000,
+          "n": 2000,
+          "no": ""
+        },
+        {
+          "et": "TARI",
+          "vo": "",
+          "l": 510,
+          "n": 510,
+          "no": ""
+        },
+        {
+          "et": "Stipendio Maryan",
+          "vo": "",
+          "l": 9880,
+          "n": 9880,
+          "no": ""
+        },
+        {
+          "et": "Contributi Maryann",
+          "vo": "",
+          "l": 1200,
+          "n": 1200,
+          "no": ""
+        },
+        {
+          "et": "IMU",
+          "vo": "",
+          "l": 869,
+          "n": 869,
+          "no": ""
+        },
+        {
+          "et": "Assicurazione casa",
+          "vo": "",
+          "l": 450,
+          "n": 450,
+          "no": ""
+        },
+        {
+          "et": "Sky",
+          "vo": "",
+          "l": 1020,
+          "n": 1020,
+          "no": ""
+        },
+        {
+          "et": "Internet",
+          "vo": "",
+          "l": 180,
+          "n": 180,
+          "no": ""
+        }
+      ]
     },
     {
       "nome": "Casa Courmayeur",
       "tipo": "apt",
-      "spese": []
+      "spese": [
+        {
+          "et": "Condominio",
+          "vo": "",
+          "l": 2200,
+          "n": 2200,
+          "no": ""
+        },
+        {
+          "et": "Internet",
+          "vo": "",
+          "l": 360,
+          "n": 360,
+          "no": ""
+        },
+        {
+          "et": "Luce",
+          "vo": "",
+          "l": 600,
+          "n": 600,
+          "no": ""
+        },
+        {
+          "et": "Gas",
+          "vo": "",
+          "l": 80,
+          "n": 80,
+          "no": ""
+        },
+        {
+          "et": "Assicurazione",
+          "vo": "",
+          "l": 260,
+          "n": 260,
+          "no": ""
+        },
+        {
+          "et": "Tari",
+          "vo": "",
+          "l": 120,
+          "n": 120,
+          "no": ""
+        }
+      ]
     },
     {
       "nome": "Spese Generali",
       "tipo": "gen",
-      "spese": []
+      "spese": [
+        {
+          "et": "Fasdac",
+          "vo": "",
+          "l": 2054,
+          "n": 2054,
+          "no": ""
+        },
+        {
+          "et": "Santambrogio",
+          "vo": "",
+          "l": 500,
+          "n": 500,
+          "no": ""
+        },
+        {
+          "et": "IMU",
+          "vo": "Anna",
+          "l": 784,
+          "n": 784,
+          "no": ""
+        },
+        {
+          "et": "Assicurazione casa",
+          "vo": "Camilla",
+          "l": 265,
+          "n": 265,
+          "no": ""
+        },
+        {
+          "et": "assicurazione casa ",
+          "vo": "Marco",
+          "l": 265,
+          "n": 265,
+          "no": ""
+        },
+        {
+          "et": "Vodafone",
+          "vo": "",
+          "l": 480,
+          "n": 480,
+          "no": ""
+        }
+      ]
     }
   ],
-  "_saved": 1782141533065
+  "_saved": 1782142024421
 }
