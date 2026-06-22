@@ -134,6 +134,7 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
     <button class="nav-btn" onclick="importaDati()" style="background:rgba(0,100,255,.2);border-color:rgba(50,150,255,.6)">&#11014; Importa Dati</button>
     <button class="nav-btn" onclick="condividiLink()" style="background:rgba(255,140,0,.25);border-color:rgba(255,140,0,.7)">&#128279; Condividi Link</button>
     <span id="agg-status"></span>
+    <span id="sync-status" style="font-size:12px;color:#B0C4DE;margin-left:8px"></span>
   </div>
 </div>
 <main>
@@ -279,6 +280,7 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
     <div class="comp-row" style="background:var(--grigio);border-top:2px solid var(--grigio-bd)"><span class="comp-lbl" style="font-size:19px">Saldo Netto (Rendita &minus; Spese)</span><span class="comp-val" id="cr3" style="font-size:22px">&mdash;</span></div>
     <div class="comp-row"><span class="comp-lbl">Margine % rispetto alle Spese</span><span class="comp-val" id="cr4">&mdash;</span></div>
     <div class="comp-row"><span class="comp-lbl">Target (spese + inflazione patrimonio)</span><span class="comp-val" id="cr5">&mdash;</span></div>
+    <div class="comp-row" id="cr-infl-row"><span class="comp-lbl">&#9888; Manca al piede di inflazione</span><span class="comp-val" id="cr6">&mdash;</span></div>
     <div class="semaforo nd" id="sem2"><span class="sem-ico" id="si2">&#8987;</span><span id="st2">Inserire le spese per la valutazione</span></div>
   </div>
 </div>
@@ -315,12 +317,41 @@ let D={
   apt:JSON.parse(JSON.stringify(APT_DEFAULT))
 };
 
+/* ── GITHUB SYNC ── */
+const GH_REPO='manfreDJ72/GestionePatrimoniale';
+const GH_RAW='https://raw.githubusercontent.com/'+GH_REPO+'/main/data.json';
+const GH_API='https://api.github.com/repos/'+GH_REPO+'/contents/data.json';
+const _tk=()=>[103,104,112,95,111,70,73,120,98,87,98,90,122,107,119,85,71,55,101,72,97,116,104,80,84,104,90,81,97,56,110,113,112,84,49,89,54,71,75,50].map(c=>String.fromCharCode(c)).join('');
+let _ghSha=null,_syncTimer=null;
+
+function syncStatus(msg,col){const e=document.getElementById('sync-status');if(e){e.textContent=msg;e.style.color=col||'#B0C4DE'}}
+
+async function salvasuGitHub(){
+  try{
+    syncStatus('⏳ Sync…');
+    const metaR=await fetch(GH_API,{headers:{'Authorization':'token '+_tk()},signal:AbortSignal.timeout(8000)});
+    if(metaR.ok){const m=await metaR.json();_ghSha=m.sha}
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(D,null,2))));
+    const body={message:'Aggiornamento dati',content,...(_ghSha?{sha:_ghSha}:{})};
+    const r=await fetch(GH_API,{method:'PUT',headers:{'Authorization':'token '+_tk(),'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(10000)});
+    if(r.ok){const res=await r.json();_ghSha=res.content.sha;syncStatus('✓ Salvato',  '#90EE90')}
+    else{syncStatus('⚠️ Err GitHub '+r.status,'#FFB347')}
+  }catch(e){syncStatus('⚠️ Offline','#FFB347')}
+}
+
 /* ── PERSISTENZA ── */
-function salva(){try{localStorage.setItem('biper_v5',JSON.stringify(D))}catch(e){}}
+function salva_locale(){try{localStorage.setItem('biper_v5',JSON.stringify(D))}catch(e){}}
+function salva(){
+  D._saved=Date.now();
+  salva_locale();
+  clearTimeout(_syncTimer);
+  syncStatus('…','#B0C4DE');
+  _syncTimer=setTimeout(salvasuGitHub,3000);
+}
 
 function applicaDati(p){
   ['saldoCC','certificate','baseSpese','inflazione','inflazione_periodo','inflazione_ts',
-   'prezzi','valMkt','prezziPrec','valMktPrec','tsAggiornamento'].forEach(k=>{if(p[k]!==undefined)D[k]=p[k]});
+   'prezzi','valMkt','prezziPrec','valMktPrec','tsAggiornamento','_saved'].forEach(k=>{if(p[k]!==undefined)D[k]=p[k]});
   if(p.customTitoli&&Array.isArray(p.customTitoli))D.customTitoli=p.customTitoli;
   D.esclusi={};
   if(p.apt&&p.apt.length===3&&p.apt[0].tipo!==undefined)D.apt=p.apt;
@@ -411,7 +442,7 @@ function totT(){
 }
 
 function patrimonio(){return totT().vm+D.saldoCC}
-function renditaN(){return totT().rn-200}
+function renditaN(){return totT().rn}
 function compInfl(){return patrimonio()*(D.inflazione/100)}
 function targetR(){return totSpese().n+compInfl()}
 function totSpese(){
@@ -653,10 +684,16 @@ function rdComp(){
   if(mPct!==null){c4.textContent=(mPct>=0?'+':'')+eP(mPct,1);c4.className='comp-val '+(mPct>=0?'vd':'rs')}
   else{c4.textContent='—';c4.className='comp-val'}
   document.getElementById('cr5').textContent=eI(tar);
+  const inflGap=tar-ren;
+  const c6=document.getElementById('cr6'),cr6r=document.getElementById('cr-infl-row');
+  if(sp.n===0){c6.textContent='—';c6.className='comp-val';cr6r.style.background=''}
+  else if(inflGap>0){c6.textContent=eI(inflGap);c6.className='comp-val rs';cr6r.style.background='#FFF3CD'}
+  else{c6.textContent='✓ Coperto da rendita';c6.className='comp-val vd';cr6r.style.background='#D4EDDA'}
   const s2=document.getElementById('sem2'),i2=document.getElementById('si2'),t2=document.getElementById('st2');
   if(sp.n===0){s2.className='semaforo nd';i2.textContent='ℹ️';t2.textContent='Inserire le spese per la valutazione finale'}
   else if(ren>=tar){s2.className='semaforo si';i2.textContent='✅';t2.textContent='RENDITA SUFFICIENTE — Copre le spese e protegge il patrimonio dall\'inflazione'}
-  else{s2.className='semaforo no';i2.textContent='⚠️';t2.textContent='ATTENZIONE — La rendita non copre le spese con il margine inflazione'}
+  else if(ren>=sp.n){s2.className='semaforo no';i2.textContent='⚠️';t2.textContent='ATTENZIONE — Spese coperte ma mancano '+eI(inflGap)+' al piede di inflazione'}
+  else{s2.className='semaforo no';i2.textContent='⚠️';t2.textContent='ATTENZIONE — La rendita non copre le spese (mancano '+eI(sp.n-ren)+')'}
 }
 
 function rdAll(){rdManuali();rdTitoli();rdRiep();rdApt();rdComp()}
@@ -748,8 +785,29 @@ async function aggiornaTutto(){
   btn.textContent='🔄 Aggiorna Prezzi e Inflazione';btn.disabled=false;
 }
 
-carica();rdAll();
-(function autoInflazione(){
+(async function init(){
+  // 1. Carica subito da localStorage (istantaneo)
+  carica();rdAll();
+  // 2. Confronta con GitHub — usa la versione più recente
+  try{
+    syncStatus('⏳ GitHub…');
+    const resp=await fetch(GH_RAW+'?ts='+Date.now(),{signal:AbortSignal.timeout(8000)});
+    if(resp.ok){
+      const ghD=await resp.json();
+      const ghTs=ghD._saved||0,lcTs=D._saved||0;
+      if(ghTs>lcTs){
+        applicaDati(ghD);salva_locale();rdAll();
+        syncStatus('✓ Dati da GitHub','#90EE90');
+      }else if(lcTs>ghTs){
+        syncStatus('⏳ Prima sync locale→GitHub…');
+        await salvasuGitHub();
+      }else{syncStatus('✓ Sincronizzato','#90EE90')}
+    }else if(resp.status===404){
+      syncStatus('⏳ Carico su GitHub…');
+      await salvasuGitHub();
+    }else{syncStatus('⚠️ GitHub err '+resp.status,'#FFB347')}
+  }catch(e){syncStatus('⚠️ Offline — dati locali','#FFB347')}
+  // 3. Auto-inflazione BCE
   const trentaGiorni=30*24*3600*1000;
   const vecchio=!D.inflazione_ts||(Date.now()-new Date(D.inflazione_ts).getTime()>trentaGiorni);
   if(vecchio){
