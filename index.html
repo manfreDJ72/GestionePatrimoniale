@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIPER — Patrimonio 2026</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blu:#1F3864;--blu-md:#2E74B5;--blu-bg:#D6E4F0;
+  --verde:#155724;--verde-bg:#D4EDDA;--verde-bd:#28A745;
+  --rosso:#721C24;--rosso-bg:#F8D7DA;
+  --giallo:#FFF9C4;--grigio:#F8F9FA;--grigio-bd:#DEE2E6;
+  --arancio:#7B3F00;--arancio-bg:#FCE4D6;
+  --testo:#212529;
+}
+body{font-family:Arial,Helvetica,sans-serif;font-size:17px;color:var(--testo);background:#EAEEF3;scroll-behavior:smooth}
+#header{background:var(--blu);color:#fff;padding:18px 24px 14px;position:sticky;top:0;z-index:100;box-shadow:0 3px 12px rgba(0,0,0,.25)}
+#header h1{font-size:24px;margin-bottom:4px}
+#header .sub{font-size:13px;color:#B0C4DE;margin-bottom:10px}
+#nav{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.nav-btn{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);padding:7px 15px;border-radius:20px;cursor:pointer;font-size:14px;font-family:Arial;text-decoration:none;display:inline-block;transition:background .2s}
+.nav-btn:hover{background:rgba(255,255,255,.28)}
+.nav-btn.primary{background:#28A745;border-color:#28A745;font-weight:bold}
+.nav-btn.primary:hover{background:#218838}
+#prezzi-status{font-size:13px;color:#B0C4DE;margin-left:6px}
+main{max-width:1200px;margin:0 auto;padding:22px 16px}
+.legenda{display:flex;gap:18px;flex-wrap:wrap;background:#FFFDE7;border:1px solid #F0D060;padding:10px 16px;border-radius:6px;margin-bottom:20px;font-size:14px}
+.legenda span{display:flex;align-items:center;gap:6px}
+.dot{width:14px;height:14px;border-radius:3px;display:inline-block}
+.dot-g{background:#FFF9C4;border:2px solid #D4A000}
+.dot-a{background:#E8F4FF;border:2px solid #2E74B5}
+.dot-v{background:#D4EDDA;border:2px solid #28A745}
+.card{background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:26px;overflow:hidden}
+.card-header{display:flex;align-items:center;gap:12px;padding:13px 20px;background:var(--blu);color:#fff}
+.card-header.verde{background:var(--verde)}
+.card-header.arancio{background:var(--arancio)}
+.card-header h2{font-size:19px;font-weight:bold}
+.card-header .ico{font-size:21px}
+.card-body{padding:20px}
+input[type=number],input[type=text],select{font-family:Arial;font-size:16px;color:var(--testo);border:2px solid var(--grigio-bd);border-radius:6px;padding:7px 10px;width:100%;min-height:44px;transition:border-color .2s;background:#fff}
+input:focus,select:focus{outline:none;border-color:var(--blu-md)}
+.inp-m{background:var(--giallo)!important;border-color:#D4A000!important}
+.inp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.inp-item{display:flex;flex-direction:column;gap:5px}
+.inp-item label{font-weight:bold;font-size:15px;color:var(--blu)}
+.inp-item .nota{font-size:13px;color:#888;font-style:italic}
+.calc-val{background:var(--verde-bg);border:2px solid var(--verde-bd);border-radius:6px;padding:9px 14px;font-size:20px;font-weight:bold;color:var(--verde);text-align:right;min-height:44px;display:flex;align-items:center;justify-content:flex-end}
+.calc-val.blu{background:var(--blu-bg);border-color:var(--blu-md);color:var(--blu-md)}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{background:var(--blu);color:#fff;padding:9px 11px;text-align:center;font-size:13px;font-weight:bold;white-space:nowrap}
+td{padding:9px 11px;border-bottom:1px solid var(--grigio-bd);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr.tot-row td{background:var(--blu);color:#fff;font-weight:bold;font-size:15px}
+tr:nth-child(even):not(.tot-row) td{background:var(--grigio)}
+tr:nth-child(odd):not(.tot-row) td{background:#fff}
+.td-cat{font-weight:bold;color:var(--blu-md);font-size:13px;white-space:nowrap}
+.td-nome{font-weight:bold}
+.td-isin{font-size:12px;color:#666;font-family:monospace}
+.td-num{text-align:right;white-space:nowrap}
+.td-net{text-align:right;font-weight:bold;color:var(--verde);white-space:nowrap}
+.prez-box{background:#E8F4FF;border:2px solid #90C0E0;border-radius:6px;padding:8px 10px;min-width:160px}
+.prez-etichetta{font-size:11px;color:#2E74B5;font-weight:bold;text-transform:uppercase;margin-bottom:2px}
+.prez-val{font-size:17px;font-weight:bold;color:var(--blu);white-space:nowrap}
+.prez-vm{font-size:19px;font-weight:bold;color:var(--blu-md);margin-top:3px;text-align:right}
+.prez-delta{font-size:13px;font-weight:bold;margin-top:3px;text-align:right}
+.prez-delta.su{color:#155724}.prez-delta.giu{color:#C00000}.prez-delta.nd{color:#888;font-weight:normal;font-style:italic}
+.fondo-box{background:var(--giallo);border:2px solid #D4A000;border-radius:6px;padding:8px 10px;min-width:160px}
+.fondo-etichetta{font-size:11px;color:#7B6A00;font-weight:bold;text-transform:uppercase;margin-bottom:2px}
+.fondo-inp{font-size:18px;font-weight:bold;color:var(--testo);text-align:right;width:100%;border:none;background:transparent;padding:0;cursor:text;font-family:Arial}
+.fondo-inp:focus{outline:none}
+.infl-box{background:#F0FFF4;border:2px solid #28A745;border-radius:6px;padding:10px 14px;min-height:44px}
+.infl-etichetta{font-size:11px;color:#155724;font-weight:bold;text-transform:uppercase;margin-bottom:3px;letter-spacing:.3px}
+.infl-val{font-size:26px;font-weight:bold;color:#155724}
+.infl-note{font-size:12px;color:#388E3C;margin-top:3px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:14px;margin-bottom:18px}
+.kpi-box{border:2px solid var(--grigio-bd);border-radius:8px;padding:15px 16px;text-align:center}
+.kpi-lbl{font-size:12px;color:#666;margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px}
+.kpi-val{font-size:24px;font-weight:bold;color:var(--blu)}
+.kpi-sub{font-size:12px;color:#888;margin-top:3px}
+.kpi-val.vd{color:var(--verde)}.kpi-val.rs{color:#C00000}
+.kpi-box.vd{background:var(--verde-bg);border-color:#28A745}
+.kpi-box.rs{background:var(--rosso-bg);border-color:#DC3545}
+.kpi-box.bl{background:var(--blu-bg);border-color:var(--blu-md)}
+.kpi-box.yl{background:#FFFDE7;border-color:#F0C000}
+.kpi-box.aa{background:#F0FFF4;border-color:#28A745}
+.semaforo{display:flex;align-items:center;justify-content:center;gap:14px;padding:18px;border-radius:8px;font-size:19px;font-weight:bold;margin-top:10px}
+.semaforo.si{background:#D4EDDA;color:#155724;border:3px solid #28A745}
+.semaforo.no{background:#F8D7DA;color:#721C24;border:3px solid #DC3545}
+.semaforo.nd{background:#f0f0f0;color:#555;border:3px solid #ccc}
+.sem-ico{font-size:32px}
+.apt-sec{border:2px solid #DEB8A0;border-radius:8px;margin-bottom:22px;overflow:hidden}
+.apt-hdr{background:var(--arancio);color:#fff;padding:11px 15px;display:flex;align-items:center;gap:12px}
+.apt-hdr input{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.5);font-size:17px;font-weight:bold;min-height:38px;padding:4px 10px;flex:1;border-radius:4px}
+.apt-body{padding:15px;background:#FFFAF7}
+table.apt-tbl th{background:#7B3F00}
+table.apt-tbl tr.tot-row td{background:#7B3F00}
+.btn-add{background:#fff;color:var(--arancio);border:2px solid var(--arancio);padding:8px 18px;border-radius:20px;cursor:pointer;font-size:15px;font-family:Arial;margin-top:11px;display:inline-flex;align-items:center;gap:5px;transition:background .2s}
+.btn-add:hover{background:var(--arancio-bg)}
+.btn-del{background:none;border:none;color:#DC3545;cursor:pointer;font-size:17px;padding:3px 8px;line-height:1}
+.comp-row{display:flex;justify-content:space-between;align-items:center;padding:13px 18px;border-bottom:1px solid var(--grigio-bd);font-size:17px}
+.comp-row:last-child{border-bottom:none}
+.comp-lbl{font-weight:bold;color:var(--blu)}
+.comp-val{font-weight:bold;font-size:19px}
+.comp-val.vd{color:#155724}.comp-val.rs{color:#C00000}
+/* Simulazione */
+.sim-banner{background:#B8360A;color:#fff;padding:11px 16px;border-radius:6px;margin-bottom:12px;font-weight:bold;font-size:14px;display:none;align-items:center;gap:10px}
+.sim-banner.attivo{display:flex}
+.sim-row td{opacity:.38;text-decoration:line-through;text-decoration-color:#C00000}
+.custom-row td{background:#FFFDE7!important;border-left:3px solid #D4A000}
+.modal-add{background:#FFFDF0;border:2px solid #D4A000;border-radius:8px;padding:18px;margin-top:14px;display:none}
+.modal-add.aperto{display:block}
+.vendi-btn{background:none;border:1.5px solid #DC3545;color:#721C24;border-radius:12px;padding:4px 10px;cursor:pointer;font-size:12px;white-space:nowrap;font-family:Arial;transition:background .15s}
+.vendi-btn:hover{background:#F8D7DA}
+.includi-btn{background:none;border:1.5px solid #28A745;color:#155724;border-radius:12px;padding:4px 10px;cursor:pointer;font-size:12px;white-space:nowrap;font-family:Arial;transition:background .15s}
+.includi-btn:hover{background:#D4EDDA}
+@media print{#header{position:static}.nav-btn{display:none}body{background:#fff;font-size:12px}.card{box-shadow:none;border:1px solid #ccc}}
+@media(max-width:600px){.kpi-grid{grid-template-columns:1fr 1fr}.kpi-val{font-size:19px}th,td{padding:7px 5px;font-size:13px}}
+</style>
+</head>
+<body>
+<div id="header">
+  <h1>&#127970; BIPER &mdash; Patrimonio e Rendite</h1>
+  <div class="sub">BPER Deposito Titoli 23036609 &bull; Ultima rilevazione: <strong id="ts-ult">mai aggiornato</strong></div>
+  <div id="nav">
+    <a href="#manuali" class="nav-btn">&#128176; Dati</a>
+    <a href="#titoli" class="nav-btn">&#128202; Titoli</a>
+    <a href="#riepilogo" class="nav-btn">&#128200; Riepilogo</a>
+    <a href="#appartamenti" class="nav-btn">&#127968; Appartamenti</a>
+    <a href="#compensazione" class="nav-btn">&#9878;&#65039; Compensazione</a>
+    <button class="nav-btn primary" onclick="aggiornaTutto()" id="btn-agg">&#128260; Aggiorna Prezzi e Inflazione</button>
+    <button class="nav-btn" onclick="esportaDati()" style="background:rgba(40,167,69,.3);border-color:rgba(40,167,69,.7)">&#11015; Esporta Dati</button>
+    <button class="nav-btn" onclick="importaDati()" style="background:rgba(0,100,255,.2);border-color:rgba(50,150,255,.6)">&#11014; Importa Dati</button>
+    <button class="nav-btn" onclick="condividiLink()" style="background:rgba(255,140,0,.25);border-color:rgba(255,140,0,.7)">&#128279; Condividi Link</button>
+    <span id="agg-status"></span>
+  </div>
+</div>
+<main>
+<div class="legenda">
+  <span><span class="dot dot-g"></span> Giallo = inserire a mano</span>
+  <span><span class="dot dot-a"></span> Azzurro = prezzi BTP automatici</span>
+  <span><span class="dot dot-v"></span> Verde = inflazione e risultati automatici</span>
+  <span>&#11015; Esporta per salvare / condividere i dati &bull; &#11014; Importa per caricarli</span>
+</div>
+
+<!-- 1. DATI -->
+<div class="card" id="manuali">
+  <div class="card-header"><span class="ico">&#128176;</span><h2>1 &mdash; Dati da Aggiornare</h2></div>
+  <div class="card-body">
+    <div class="inp-grid" style="grid-template-columns:1fr 1fr;margin-bottom:16px">
+      <div class="inp-item">
+        <label>Saldo Conto Corrente oggi (&euro;)</label>
+        <input type="number" id="saldoCC" class="inp-m" step="0.01" oninput="salvaCalc()">
+        <span class="nota">Aggiornare con il saldo BPER del giorno</span>
+      </div>
+      <div class="inp-item">
+        <label style="color:var(--verde)">&#8594; Base Spese Annue (da Appartamenti)</label>
+        <div class="calc-val" id="baseSpeseCalc">0 &euro;</div>
+        <span class="nota">Somma automatica dalla sezione 4 &mdash; Appartamenti</span>
+      </div>
+    </div>
+    <div class="inp-grid" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="inp-item">
+        <label style="color:var(--verde)">Inflazione IPCA Italia &mdash; Fonte: BCE</label>
+        <div class="infl-box" id="infl-box">
+          <div class="infl-etichetta">&#128260; Aggiornamento automatico</div>
+          <div class="infl-val" id="infl-val">&#8230;</div>
+          <div class="infl-note" id="infl-note">Caricamento in corso</div>
+        </div>
+        <span class="nota">Aggiornata ad ogni clic su &ldquo;Aggiorna Prezzi e Inflazione&rdquo;</span>
+      </div>
+      <div class="inp-item">
+        <label style="color:var(--blu-md)">&#8594; Componente Inflazione sul Patrimonio</label>
+        <div class="calc-val blu" id="compInfl">0 &euro;</div>
+        <span class="nota">Patrimonio totale &times; Inflazione%</span>
+      </div>
+      <div class="inp-item">
+        <label style="color:var(--verde)">&#8594; Target Rendita (Spese + Inflazione Patrimonio)</label>
+        <div class="calc-val" id="targetCalc">0 &euro;</div>
+        <span class="nota">Obiettivo pieno: copre spese e protegge dall&rsquo;inflazione</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. TITOLI -->
+<div class="card" id="titoli">
+  <div class="card-header"><span class="ico">&#128202;</span><h2>2 &mdash; Titoli e Investimenti</h2></div>
+  <div class="card-body">
+    <p style="font-size:13px;color:#555;margin-bottom:12px;background:#E8F4FF;padding:8px 12px;border-radius:5px;border-left:4px solid var(--blu-md)">
+      &#128260; Prezzi BTP: automatici con il tasto <strong>Aggiorna</strong>. Valori fondi: aggiornare a mano (casella gialla). Clic su &#128279; per Borsa Italiana.
+    </p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Categoria</th>
+          <th style="text-align:left">Strumento</th>
+          <th>ISIN</th>
+          <th>Valore (€)</th>
+          <th>Cedola %</th>
+          <th>Rendita Lorda</th>
+          <th>Tasse</th>
+          <th>Rendita Netta</th>
+          <th>Azioni</th>
+        </tr></thead>
+        <tbody id="tbody-titoli"></tbody>
+        <tfoot><tr class="tot-row">
+          <td colspan="3" style="text-align:left">TOTALE TITOLI</td>
+          <td class="td-num" id="tot-vm">&mdash;</td>
+          <td></td>
+          <td class="td-num" id="tot-rl">&mdash;</td>
+          <td class="td-num" id="tot-tx">&mdash;</td>
+          <td class="td-num" id="tot-rn">&mdash;</td>
+          <td></td>
+        </tr></tfoot>
+      </table>
+    </div>
+
+    <div class="sim-banner" id="sim-banner">
+      <span style="font-size:18px">&#9888;</span>
+      <span>SIMULAZIONE ATTIVA &mdash; I totali riflettono le posizioni simulate. Clicca &ldquo;Reimposta&rdquo; per tornare ai valori reali.</span>
+    </div>
+    <div style="margin-top:13px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <button class="btn-add" id="btn-add-titolo" onclick="toggleAddForm()" style="color:var(--blu-md);border-color:var(--blu-md);margin-top:0">&#65291; Inserisci fondo / Acquisto simulato</button>
+      <button class="btn-add" id="btn-reset-sim" onclick="resetSim()" style="color:#721C24;border-color:#DC3545;display:none;margin-top:0">&#10005; Reimposta simulazione</button>
+    </div>
+    <div class="modal-add" id="modal-add">
+      <h3 style="margin-bottom:13px;color:var(--blu);font-size:17px">&#65291; Nuova posizione (simulazione acquisto)</h3>
+      <div class="inp-grid" style="grid-template-columns:repeat(auto-fit,minmax(195px,1fr))">
+        <div class="inp-item"><label>Nome *</label><input type="text" id="add-nome" placeholder="es. Fondo Pimco, BTP Italia 2031&hellip;"></div>
+        <div class="inp-item"><label>Categoria</label>
+          <select id="add-cat"><option>Titoli di Stato</option><option selected>Fondo</option><option>Certificate</option><option>Conto Deposito</option><option>Altro</option></select></div>
+        <div class="inp-item"><label>ISIN (opzionale)</label><input type="text" id="add-isin" placeholder="es. IT0005583486" style="font-family:monospace"></div>
+        <div class="inp-item"><label>Valore di Mercato (€) *</label><input type="number" id="add-vm" step="1000" placeholder="es. 50000" min="0"></div>
+        <div class="inp-item"><label>Cedola / Rendimento %</label><input type="number" id="add-ced" step="0.1" placeholder="es. 3.5" min="0"></div>
+        <div class="inp-item"><label>Aliquota fiscale</label>
+          <select id="add-aliq"><option value="0.125">12,5% &mdash; Titoli di Stato</option><option value="0.26" selected>26% &mdash; Fondi / Certificate</option><option value="0">0% &mdash; esente</option></select></div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn-add" onclick="salvaCustom()" style="color:var(--verde);border-color:var(--verde-bd);font-weight:bold;margin-top:0">&#10003; Aggiungi al portfolio</button>
+        <button class="btn-add" onclick="toggleAddForm()" style="color:#666;border-color:#999;margin-top:0">Annulla</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. RIEPILOGO -->
+<div class="card" id="riepilogo">
+  <div class="card-header verde"><span class="ico">&#128200;</span><h2>3 &mdash; Riepilogo Patrimonio e Rendite</h2></div>
+  <div class="card-body">
+    <div class="kpi-grid">
+      <div class="kpi-box bl"><div class="kpi-lbl">Patrimonio Totale</div><div class="kpi-val" id="k-pat">&mdash;</div></div>
+      <div class="kpi-box vd"><div class="kpi-lbl">Rendita Netta Annua</div><div class="kpi-val vd" id="k-ren">&mdash;</div></div>
+      <div class="kpi-box bl"><div class="kpi-lbl">Rendimento Netto %</div><div class="kpi-val" id="k-pct">&mdash;</div></div>
+      <div class="kpi-box yl"><div class="kpi-lbl">Base Spese Annue</div><div class="kpi-val" id="k-bsp">&mdash;</div></div>
+      <div class="kpi-box aa"><div class="kpi-lbl">Inflazione IPCA</div><div class="kpi-val" id="k-inf-pct">&mdash;</div><div class="kpi-sub" id="k-inf-periodo"></div></div>
+      <div class="kpi-box aa"><div class="kpi-lbl">Comp. Inflazione sul Patrimonio</div><div class="kpi-val" id="k-inf">&mdash;</div></div>
+      <div class="kpi-box yl"><div class="kpi-lbl">Target Rendita (Spese + Infl.)</div><div class="kpi-val" id="k-tar">&mdash;</div></div>
+      <div class="kpi-box" id="kb-sco"><div class="kpi-lbl">Scostamento da Target</div><div class="kpi-val" id="k-sco">&mdash;</div></div>
+      <div class="kpi-box" id="kb-cov"><div class="kpi-lbl">Copertura Spese %</div><div class="kpi-val" id="k-cov">&mdash;</div><div class="kpi-sub">obiettivo: &gt;100%</div></div>
+    </div>
+    <div class="semaforo nd" id="sem1"><span class="sem-ico" id="si1">&#8987;</span><span id="st1">Calcolo in corso&hellip;</span></div>
+  </div>
+</div>
+
+<!-- 4. APPARTAMENTI -->
+<div class="card" id="appartamenti">
+  <div class="card-header arancio"><span class="ico">&#127968;</span><h2>4 &mdash; Spese Appartamenti</h2></div>
+  <div class="card-body" id="apt-body"></div>
+</div>
+
+<!-- 5. COMPENSAZIONE -->
+<div class="card" id="compensazione">
+  <div class="card-header verde"><span class="ico">&#9878;&#65039;</span><h2>5 &mdash; Compensazione Rendite / Spese</h2></div>
+  <div class="card-body">
+    <div class="comp-row"><span class="comp-lbl">Rendita Netta Annua Totale</span><span class="comp-val vd" id="cr1">&mdash;</span></div>
+    <div class="comp-row"><span class="comp-lbl">Spese Appartamenti Nette Totali</span><span class="comp-val rs" id="cr2">&mdash;</span></div>
+    <div class="comp-row" style="background:var(--grigio);border-top:2px solid var(--grigio-bd)"><span class="comp-lbl" style="font-size:19px">Saldo Netto (Rendita &minus; Spese)</span><span class="comp-val" id="cr3" style="font-size:22px">&mdash;</span></div>
+    <div class="comp-row"><span class="comp-lbl">Margine % rispetto alle Spese</span><span class="comp-val" id="cr4">&mdash;</span></div>
+    <div class="comp-row"><span class="comp-lbl">Target (spese + inflazione patrimonio)</span><span class="comp-val" id="cr5">&mdash;</span></div>
+    <div class="semaforo nd" id="sem2"><span class="sem-ico" id="si2">&#8987;</span><span id="st2">Inserire le spese per la valutazione</span></div>
+  </div>
+</div>
+<footer style="text-align:center;color:#999;font-size:13px;padding:20px 0 40px">
+  Inflazione: BCE (IPCA Italia) &bull; Prezzi BTP: Yahoo Finance / Borsa Italiana<br>
+  <strong style="color:#555">Come condividere i dati:</strong> clicca &#11015; <strong>Esporta Dati</strong> &rarr; invia il file JSON via email &rarr; il destinatario clicca &#11014; <strong>Importa Dati</strong>
+</footer>
+</main>
+<script>
+const TITOLI=[
+  {id:'t2',cat:'Titoli di Stato',nome:'BTP 7,25% — scad. 11/2026',isin:'IT0001086567',ticker:'IT0001086567.MI',tipo:'btp',nominale:59316.48,cedola:0.0725,aliq:0.125,prezDef:101.77,prezAcquisto:100,link:'https://www.borsaitaliana.it/borsa/titoli-di-stato/btp/scheda/IT0001086567.html'},
+  {id:'t3',cat:'Titoli di Stato',nome:'BTP Valore 3,25%→4% — scad. 03/2030',isin:'IT0005583486',ticker:'IT0005583486.MI',tipo:'btp',nominale:50000,cedola:0.0325,aliq:0.125,prezDef:102.32,prezAcquisto:100,link:'https://www.borsaitaliana.it/borsa/titoli-di-stato/btp/scheda/IT0005583486.html'},
+  {id:'t4',cat:'Titoli di Stato',nome:'BTP Valore 4% — scad. 06/2027',isin:'IT0005547408',ticker:'IT0005547408.MI',tipo:'btp',nominale:150000,cedola:0.04,aliq:0.125,prezDef:101.17,prezAcquisto:100,link:'https://www.borsaitaliana.it/borsa/titoli-di-stato/btp/scheda/IT0005547408.html'},
+  {id:'t5',cat:'Fondo',nome:'JPM Flexible Credit D EUR',isin:'LU0562087980',ticker:null,tipo:'fondo',cedola:0.0594,aliq:0.26,vmDef:199827.65,link:null},
+  {id:'t6',cat:'Fondo',nome:'JPM Global Income D EUR',isin:'LU0404220724',ticker:null,tipo:'fondo',cedola:0.0519,aliq:0.26,vmDef:170000,link:null},
+  {id:'t7',cat:'Fondo',nome:'JPM Europe High Yield Bond D EUR',isin:'LU1549373071',ticker:null,tipo:'fondo',cedola:0.04,aliq:0.26,vmDef:230000,link:null},
+  {id:'t8',cat:'Certificate',nome:'BPER Protection Memory Coupon',isin:'IT0005709875',ticker:null,tipo:'fondo',cedola:0.045,aliq:0,vmDef:50000,link:null},
+  {id:'t9',cat:'Conto Deposito',nome:'Conto Deposito Vincolato BPER',isin:'',ticker:null,tipo:'fondo',cedola:0.033,aliq:0.26,vmDef:100000,link:null},
+  {id:'t10',cat:'Fondo',nome:'Fondo Peer',isin:'',ticker:null,tipo:'fondo',cedola:0.04,aliq:0,vmDef:40000,link:null}
+];
+
+const APT_DEFAULT=[
+  {nome:'Via Correggio — Secondo Piano', tipo:'apt', spese:[]},
+  {nome:'Casa Courmayeur',               tipo:'apt', spese:[]},
+  {nome:'Spese Generali',               tipo:'gen', spese:[]}
+];
+
+let D={
+  saldoCC:128957.56, certificate:50000, baseSpese:32000,
+  inflazione:1.5, inflazione_periodo:null, inflazione_ts:null,
+  prezzi:{}, valMkt:{}, prezziPrec:{}, valMktPrec:{},
+  tsAggiornamento:null,
+  customTitoli:[], esclusi:{},
+  apt:JSON.parse(JSON.stringify(APT_DEFAULT))
+};
+
+/* ── PERSISTENZA ── */
+function salva(){try{localStorage.setItem('biper_v5',JSON.stringify(D))}catch(e){}}
+
+function applicaDati(p){
+  ['saldoCC','certificate','baseSpese','inflazione','inflazione_periodo','inflazione_ts',
+   'prezzi','valMkt','prezziPrec','valMktPrec','tsAggiornamento'].forEach(k=>{if(p[k]!==undefined)D[k]=p[k]});
+  if(p.customTitoli&&Array.isArray(p.customTitoli))D.customTitoli=p.customTitoli;
+  D.esclusi={};
+  if(p.apt&&p.apt.length===3&&p.apt[0].tipo!==undefined)D.apt=p.apt;
+}
+
+function carica(){
+  try{
+    // Prova prima URL hash (link condiviso)
+    if(window.location.hash&&window.location.hash.length>10){
+      try{
+        const enc=window.location.hash.slice(1);
+        const p=JSON.parse(decodeURIComponent(escape(atob(enc))));
+        applicaDati(p);
+        history.replaceState(null,'',window.location.pathname+window.location.search);
+        return;
+      }catch(e){}
+    }
+    // Poi localStorage v5, poi migrazione da v4
+    let s=localStorage.getItem('biper_v5');
+    if(!s)s=localStorage.getItem('biper_v4');
+    if(!s)return;
+    applicaDati(JSON.parse(s));
+  }catch(e){}
+}
+
+/* ── EXPORT / IMPORT / SHARE ── */
+function esportaDati(){
+  const json=JSON.stringify(D,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  const data=new Date().toLocaleDateString('it-IT').replace(/\//g,'-');
+  a.download='BIPER_dati_'+data+'.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importaDati(){
+  const inp=document.createElement('input');
+  inp.type='file';inp.accept='.json';
+  inp.onchange=function(e){
+    const reader=new FileReader();
+    reader.onload=function(ev){
+      try{
+        const p=JSON.parse(ev.target.result);
+        applicaDati(p);salva();rdAll();
+        alert('✅ Dati importati con successo!');
+      }catch(err){alert('❌ Errore: assicurati di usare un file JSON esportato da BIPER.')}
+    };
+    reader.readAsText(e.target.files[0]);
+  };
+  inp.click();
+}
+
+function condividiLink(){
+  try{
+    const enc=btoa(unescape(encodeURIComponent(JSON.stringify(D))));
+    const base=window.location.href.split('#')[0];
+    const url=base+'#'+enc;
+    if(base.startsWith('file://')){
+      alert('⚠️ Il link con dati funziona solo quando la pagina è ospitata online (es. Netlify).\n\n✅ SOLUZIONE SEMPLICE ORA:\n  1. Clicca "⬇ Esporta Dati" → scarica il file JSON\n  2. Invialo via email o WhatsApp\n  3. Il destinatario clicca "⬆ Importa Dati"\n\nPer la versione online con link condivisibile: manda il file HTML su netlify.com/drop (gratis, 30 secondi).');
+    }else{
+      navigator.clipboard.writeText(url)
+        .then(()=>alert('✅ Link copiato negli appunti!\nChiunque lo apra vedrà tutti i tuoi dati attuali.'))
+        .catch(()=>prompt('Copia questo link e invialo:',url));
+    }
+  }catch(e){alert('Errore nella generazione del link.')}
+}
+
+/* ── CALCOLI ── */
+function getPrez(t){return D.prezzi[t.id]!==undefined?D.prezzi[t.id]:t.prezDef}
+function getVm(t){return D.valMkt[t.id]!==undefined?D.valMkt[t.id]:(t.vmDef||0)}
+
+function calcT(t){
+  if(D.esclusi&&D.esclusi[t.id])return{vm:0,rl:0,tx:0,rn:0};
+  let vm,base;
+  if(t.tipo==='btp'){vm=t.nominale*getPrez(t)/100;base=t.nominale}
+  else{vm=getVm(t);base=vm}
+  const rl=base*t.cedola,tx=rl*t.aliq,rn=rl-tx;
+  return{vm,rl,tx,rn};
+}
+
+function totT(){
+  let vm=0,rl=0,tx=0,rn=0;
+  [...TITOLI,...(D.customTitoli||[])].forEach(t=>{const c=calcT(t);vm+=c.vm;rl+=c.rl;tx+=c.tx;rn+=c.rn});
+  return{vm,rl,tx,rn};
+}
+
+function patrimonio(){return totT().vm+D.saldoCC}
+function renditaN(){return totT().rn-200}
+function compInfl(){return patrimonio()*(D.inflazione/100)}
+function targetR(){return totSpese().n+compInfl()}
+function totSpese(){
+  let l=0,n=0;
+  D.apt.forEach(a=>a.spese.forEach(s=>{l+=+s.l||0;n+=+s.n||0}));
+  return{l,n};
+}
+
+function eI(n,dec=0){if(n===null||n===undefined||isNaN(n))return'—';return n.toLocaleString('it-IT',{minimumFractionDigits:dec,maximumFractionDigits:dec})+' €'}
+function eP(n,dec=2){if(n===null||isNaN(n))return'—';return Number(n).toFixed(dec)+'%'}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
+
+function periodoLeggibile(p){
+  if(!p)return'';
+  const mesi=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+  const parts=p.split('-');
+  if(parts.length===2){const m=parseInt(parts[1],10);return(mesi[m-1]||parts[1])+' '+parts[0]}
+  return p;
+}
+function deltaStr(cur,prec){
+  if(prec===null||prec===undefined||prec===0)return{txt:'Prima rilevazione',cls:'nd'};
+  const d=cur-prec,pct=(d/Math.abs(prec))*100;
+  return{txt:`${d>=0?'▲':'▼'} ${d>=0?'+':''}${d.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})} (${d>=0?'+':''}${pct.toFixed(2)}%)`,cls:d>=0?'su':'giu'};
+}
+function plusStr(attuale,investito){
+  if(!investito)return{txt:'—',cls:'nd'};
+  const d=attuale-investito,pct=(d/Math.abs(investito))*100;
+  const sn=d>=0?'+':'';
+  return{txt:`${d>=0?'▲':'▼'} ${sn}${Math.round(d).toLocaleString('it-IT')} € (${sn}${pct.toFixed(2)}%)`,cls:d>=0?'su':'giu'};
+}
+
+/* ── FETCH ── */
+async function fetchInflazione(){
+  const url='https://data-api.ecb.europa.eu/service/data/ICP/M.IT.N.000000.4.ANR?format=jsondata&lastNObservations=1';
+  const resp=await fetch(url,{signal:AbortSignal.timeout(10000)});
+  if(!resp.ok)throw new Error('HTTP '+resp.status);
+  const d=await resp.json();
+  const series=d.dataSets[0].series;
+  const sk=Object.keys(series)[0];
+  const obs=series[sk].observations;
+  const obsKeys=Object.keys(obs).sort((a,b)=>parseInt(a)-parseInt(b));
+  const valore=obs[obsKeys[obsKeys.length-1]][0];
+  const timeDim=d.structure.dimensions.observation[0].values;
+  const periodo=timeDim[timeDim.length-1].id;
+  return{valore:parseFloat(valore),periodo};
+}
+async function fetchYahoo(ticker){
+  const url=`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
+  const proxy=`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+  const resp=await fetch(proxy,{signal:AbortSignal.timeout(8000)});
+  const outer=await resp.json();
+  const inner=JSON.parse(outer.contents);
+  return inner.chart.result[0].meta.regularMarketPrice;
+}
+
+/* ── RENDER ── */
+function rdInflBox(){
+  const v=document.getElementById('infl-val'),n=document.getElementById('infl-note');
+  if(D.inflazione_periodo){
+    v.textContent=eP(D.inflazione,1);
+    n.textContent='BCE · IPCA Italia · '+periodoLeggibile(D.inflazione_periodo);
+  }else{
+    v.textContent='—';
+    n.textContent='⏳ Clicca "Aggiorna" per caricare';
+  }
+}
+
+function rdManuali(){
+  document.getElementById('saldoCC').value=D.saldoCC;
+  const sp=totSpese().n;
+  document.getElementById('baseSpeseCalc').textContent=sp>0?eI(sp):'0 € — inserire le spese nella sezione Appartamenti';
+  document.getElementById('compInfl').textContent=eI(compInfl());
+  document.getElementById('targetCalc').textContent=eI(targetR());
+  document.getElementById('ts-ult').textContent=D.tsAggiornamento||'mai aggiornato';
+  rdInflBox();
+}
+
+function rdTitoli(){
+  const tb=document.getElementById('tbody-titoli');tb.innerHTML='';
+  const simAny=Object.values(D.esclusi||{}).some(v=>v)||(D.customTitoli||[]).length>0;
+  document.getElementById('sim-banner').className=simAny?'sim-banner attivo':'sim-banner';
+  document.getElementById('btn-reset-sim').style.display=simAny?'inline-flex':'none';
+
+  function renderRow(t,isCustom){
+    const escluso=!!(D.esclusi&&D.esclusi[t.id]);
+    const c=calcT(t);
+    let boxH;
+    const rowH=(lbl,val,small)=>`<div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:3px">
+      <span style="font-size:11px;color:#5a8fc4">${lbl}</span>
+      <span style="${small?'font-size:13px;color:#555':'font-size:17px;font-weight:bold;color:var(--blu-md)'}">${val}</span></div>`;
+    if(t.tipo==='btp'){
+      const prez=getPrez(t),investito=t.nominale*(t.prezAcquisto||100)/100;
+      const pls=plusStr(c.vm,investito);
+      const dP=deltaStr(prez,D.prezziPrec[t.id]);
+      boxH=`<div class="prez-box" style="min-width:195px">
+        <div class="prez-etichetta">BTP &mdash; prezzi automatici &#128260;</div>
+        ${rowH('Investito',eI(investito),true)}
+        ${rowH('Oggi',eI(c.vm),false)}
+        <div class="prez-delta ${pls.cls}" style="margin-top:3px">${pls.txt}</div>
+        ${D.prezziPrec[t.id]?`<div style="font-size:11px;color:#888;margin-top:2px;text-align:right">Da ieri: ${dP.txt}</div>`:''}
+      </div>`;
+    }else if(t.id==='t9'){
+      const vm=getVm(t),investito=t.vmDef||0,pls=plusStr(vm,investito);
+      boxH=`<div class="fondo-box" style="min-width:195px">
+        <div class="fondo-etichetta">Conto Deposito &#9998; aggiorna</div>
+        ${rowH('Investito',eI(investito),true).replace('#5a8fc4','#7B6A00').replace('#555','#7B3F00')}
+        <input class="fondo-inp" type="number" step="100" min="0" value="${vm.toFixed(0)}"
+          onblur="aggiornaVm('${t.id}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" style="text-align:right;margin-top:3px">
+        <div class="prez-delta ${pls.cls}" style="margin-top:3px">${pls.txt}</div>
+      </div>`;
+    }else{
+      const vm=getVm(t),investito=t.vmDef||0,pls=plusStr(vm,investito);
+      boxH=`<div class="prez-box" style="min-width:195px">
+        <div class="prez-etichetta">Fondo &mdash; valore mercato</div>
+        ${rowH('Investito',eI(investito),true)}
+        ${rowH('Oggi',eI(vm),false)}
+        <div class="prez-delta ${pls.cls}" style="margin-top:3px">${pls.txt}</div>
+      </div>`;
+    }
+    const linkH=t.link?`<a href="${t.link}" target="_blank" style="font-size:19px;text-decoration:none;vertical-align:middle" title="Borsa Italiana">🔗</a>`:'';
+    let azioneH;
+    if(isCustom){
+      azioneH=`<button class="btn-del" onclick="delCustom('${t.id}')" title="Rimuovi posizione simulata" style="font-size:14px">✕ Rimuovi</button>`;
+    }else{
+      azioneH='';
+    }
+    const tr=document.createElement('tr');
+    if(escluso)tr.className='sim-row';
+    else if(isCustom)tr.className='custom-row';
+    tr.innerHTML=`<td class="td-cat">${esc(t.cat)}</td>
+      <td class="td-nome">${esc(t.nome)}${isCustom?'<br><span style="font-size:11px;color:#D4A000;font-style:italic">&#9654; simulazione</span>':''}</td>
+      <td class="td-isin">${esc(t.isin||'—')}</td>
+      <td style="min-width:175px;padding:6px 10px">${boxH}</td>
+      <td class="td-num" style="color:var(--blu-md)">${eP(t.cedola*100)}</td>
+      <td class="td-num">${eI(c.rl)}</td>
+      <td class="td-num" style="color:#888">${eI(c.tx)}</td>
+      <td class="td-net">${eI(c.rn)}</td>
+      <td style="text-align:center;white-space:nowrap">${azioneH}${linkH?' '+linkH:''}</td>`;
+    tb.appendChild(tr);
+  }
+
+  TITOLI.forEach(t=>renderRow(t,false));
+  (D.customTitoli||[]).forEach(t=>renderRow(t,true));
+
+  const tt=totT();
+  ['tot-vm','tot-rl','tot-tx','tot-rn'].forEach((id,i)=>
+    document.getElementById(id).textContent=eI([tt.vm,tt.rl,tt.tx,tt.rn][i]));
+}
+
+function rdRiep(){
+  const pat=patrimonio(),ren=renditaN(),tar=targetR(),ci=compInfl();
+  const sp=totSpese().n;
+  const sco=ren-sp,cov=sp>0?(ren/sp)*100:0,rPct=pat>0?(ren/pat)*100:0;
+  document.getElementById('k-pat').textContent=eI(pat);
+  document.getElementById('k-ren').textContent=eI(ren);
+  document.getElementById('k-pct').textContent=eP(rPct);
+  document.getElementById('k-bsp').textContent=eI(totSpese().n);
+  document.getElementById('k-inf-pct').textContent=eP(D.inflazione,1);
+  document.getElementById('k-inf-periodo').textContent=D.inflazione_periodo?'BCE·IPCA · '+periodoLeggibile(D.inflazione_periodo):'in attesa';
+  document.getElementById('k-inf').textContent=eI(ci);
+  document.getElementById('k-tar').textContent=eI(tar);
+  const se=document.getElementById('k-sco'),sb=document.getElementById('kb-sco');
+  se.textContent=(sco>=0?'+':'')+eI(sco);se.className='kpi-val '+(sco>=0?'vd':'rs');
+  sb.className='kpi-box '+(sco>=0?'vd':'rs');
+  const ce=document.getElementById('k-cov'),cb=document.getElementById('kb-cov');
+  ce.textContent=eP(cov,1);ce.className='kpi-val '+(cov>=100?'vd':'rs');
+  cb.className='kpi-box '+(cov>=100?'vd':'rs');
+  const s1=document.getElementById('sem1'),i1=document.getElementById('si1'),t1=document.getElementById('st1');
+  if(ren>=sp){s1.className='semaforo si';i1.textContent='✅';t1.textContent='SPESE COPERTE — La rendita supera le spese di '+eI(sco)+(ren>=tar?' · copre anche la quota inflazione':' · non copre ancora la quota inflazione ('+eI(ren-tar)+')')}
+  else{s1.className='semaforo no';i1.textContent='⚠️';t1.textContent=`RENDITA INSUFFICIENTE — Mancano ${eI(Math.abs(sco))} per coprire le spese`}
+}
+
+function rdApt(){
+  const body=document.getElementById('apt-body');body.innerHTML='';
+  D.apt.forEach((a,ai)=>{
+    const isGen=(a.tipo==='gen');
+    const totL=a.spese.reduce((s,r)=>s+(+r.l||0),0);
+    const totN=a.spese.reduce((s,r)=>s+(+r.n||0),0);
+    let righe='';
+    a.spese.forEach((sp,si)=>{
+      righe+=`<tr>
+        <td><input type="text" class="inp-m" value="${esc(sp.et||'')}" placeholder="es. Condominio, IMU…"
+          oninput="D.apt[${ai}].spese[${si}].et=this.value;salvaCalc()" style="min-height:40px"></td>
+        <td><input type="text" class="inp-m" value="${esc(sp.vo||'')}" placeholder="Descrizione"
+          oninput="D.apt[${ai}].spese[${si}].vo=this.value;salvaCalc()" style="min-height:40px"></td>
+        <td><input type="number" class="inp-m" value="${sp.l||''}" step="1" placeholder="0"
+          oninput="D.apt[${ai}].spese[${si}].l=parseFloat(this.value)||0;salvaCalc()" style="min-height:40px;text-align:right"></td>
+        <td><input type="number" class="inp-m" value="${sp.n||''}" step="1" placeholder="0"
+          oninput="D.apt[${ai}].spese[${si}].n=parseFloat(this.value)||0;salvaCalc()" style="min-height:40px;text-align:right"></td>
+        <td style="min-width:260px"><input type="text" class="inp-m" value="${esc(sp.no||'')}" placeholder="Note"
+          oninput="D.apt[${ai}].spese[${si}].no=this.value;salvaCalc()" style="min-height:40px"></td>
+        <td style="text-align:center"><button class="btn-del" onclick="delSpesa(${ai},${si})">✕</button></td>
+      </tr>`;
+    });
+    const hdrColor=isGen?'#2C5F2E':'#7B3F00';
+    const ico=isGen?'📋':'🏠';
+    const div=document.createElement('div');
+    div.className='apt-sec';
+    div.style.borderColor=isGen?'#A8D5A2':'#DEB8A0';
+    div.innerHTML=`
+      <div class="apt-hdr" style="background:${hdrColor}">
+        <span style="font-size:21px">${ico}</span>
+        <input type="text" value="${esc(a.nome)}" placeholder="Nome sezione"
+          oninput="D.apt[${ai}].nome=this.value;salvaCalc()">
+      </div>
+      <div class="apt-body" style="background:${isGen?'#F0FFF4':'#FFFAF7'}">
+        <div class="tbl-wrap"><table class="apt-tbl">
+          <thead><tr>
+            <th style="text-align:left;min-width:170px">&#127939; Etichetta / Tipo Spesa</th>
+            <th style="text-align:left;min-width:200px">&#127939; Voce di Spesa</th>
+            <th style="min-width:140px">&#127939; Importo Lordo (€)</th>
+            <th style="min-width:140px">&#127939; Importo Netto (€)</th>
+            <th style="text-align:left;min-width:260px">&#127939; Note</th>
+            <th style="width:40px"></th>
+          </tr></thead>
+          <tbody>${righe}</tbody>
+          <tfoot><tr class="tot-row" style="background:${hdrColor}">
+            <td colspan="2" style="text-align:left">TOTALE ${esc(a.nome)}</td>
+            <td style="text-align:right">${eI(totL)}</td>
+            <td style="text-align:right">${eI(totN)}</td>
+            <td colspan="2"></td>
+          </tr></tfoot>
+        </table></div>
+        <button class="btn-add" style="${isGen?'color:#2C5F2E;border-color:#2C5F2E':''}"
+          onclick="addSpesa(${ai})">&#65291; Aggiungi voce</button>
+      </div>`;
+    body.appendChild(div);
+  });
+}
+
+function rdComp(){
+  const ren=renditaN(),sp=totSpese(),tar=targetR();
+  const saldo=ren-sp.n,mPct=sp.n>0?(saldo/sp.n)*100:null;
+  document.getElementById('cr1').textContent=eI(ren);
+  document.getElementById('cr2').textContent=eI(sp.n);
+  const c3=document.getElementById('cr3');
+  c3.textContent=(saldo>=0?'+':'')+eI(saldo);c3.className='comp-val '+(saldo>=0?'vd':'rs');
+  const c4=document.getElementById('cr4');
+  if(mPct!==null){c4.textContent=(mPct>=0?'+':'')+eP(mPct,1);c4.className='comp-val '+(mPct>=0?'vd':'rs')}
+  else{c4.textContent='—';c4.className='comp-val'}
+  document.getElementById('cr5').textContent=eI(tar);
+  const s2=document.getElementById('sem2'),i2=document.getElementById('si2'),t2=document.getElementById('st2');
+  if(sp.n===0){s2.className='semaforo nd';i2.textContent='ℹ️';t2.textContent='Inserire le spese per la valutazione finale'}
+  else if(ren>=tar){s2.className='semaforo si';i2.textContent='✅';t2.textContent='RENDITA SUFFICIENTE — Copre le spese e protegge il patrimonio dall\'inflazione'}
+  else{s2.className='semaforo no';i2.textContent='⚠️';t2.textContent='ATTENZIONE — La rendita non copre le spese con il margine inflazione'}
+}
+
+function rdAll(){rdManuali();rdTitoli();rdRiep();rdApt();rdComp()}
+
+function salvaCalc(){
+  D.saldoCC=parseFloat(document.getElementById('saldoCC').value)||0;
+  salva();
+  rdManuali();
+  rdTitoli();rdRiep();rdComp();
+}
+
+function aggiornaVm(id,val){
+  D.valMkt[id]=parseFloat(val)||0;
+  salva();
+  rdTitoli();rdRiep();rdComp();
+}
+
+function addSpesa(ai){D.apt[ai].spese.push({et:'',vo:'',l:0,n:0,no:''});salva();rdApt();rdManuali();rdRiep();rdComp()}
+function delSpesa(ai,si){D.apt[ai].spese.splice(si,1);salva();rdApt();rdManuali();rdRiep();rdComp()}
+
+/* ── SIMULAZIONE ── */
+function simVendi(id){
+  if(!D.esclusi)D.esclusi={};
+  D.esclusi[id]=!D.esclusi[id];
+  salva();rdTitoli();rdRiep();rdComp();
+}
+
+function resetSim(){
+  D.esclusi={};D.customTitoli=[];
+  salva();rdAll();
+}
+
+let addFormOpen=false;
+function toggleAddForm(){
+  addFormOpen=!addFormOpen;
+  document.getElementById('modal-add').className=addFormOpen?'modal-add aperto':'modal-add';
+  document.getElementById('btn-add-titolo').textContent=addFormOpen?'✕ Chiudi':'＋ Inserisci fondo / Acquisto simulato';
+}
+
+function salvaCustom(){
+  const nome=document.getElementById('add-nome').value.trim();
+  if(!nome){alert('Inserisci il nome del fondo/titolo');return}
+  const vm=parseFloat(document.getElementById('add-vm').value)||0;
+  if(!vm){alert('Inserisci il valore di mercato');return}
+  if(!D.customTitoli)D.customTitoli=[];
+  D.customTitoli.push({
+    id:'c'+Date.now(),
+    cat:document.getElementById('add-cat').value,
+    nome,
+    isin:document.getElementById('add-isin').value.trim(),
+    tipo:'fondo',
+    cedola:(parseFloat(document.getElementById('add-ced').value)||0)/100,
+    aliq:parseFloat(document.getElementById('add-aliq').value)||0.26,
+    vmDef:vm,ticker:null,link:null
+  });
+  ['add-nome','add-isin','add-vm','add-ced'].forEach(id=>document.getElementById(id).value='');
+  salva();
+  if(addFormOpen)toggleAddForm();
+  rdTitoli();rdRiep();rdComp();
+}
+
+function delCustom(id){
+  D.customTitoli=(D.customTitoli||[]).filter(t=>t.id!==id);
+  salva();rdTitoli();rdRiep();rdComp();
+}
+
+/* ── AGGIORNA PREZZI E INFLAZIONE ── */
+async function aggiornaTutto(){
+  const btn=document.getElementById('btn-agg'),sta=document.getElementById('agg-status');
+  btn.textContent='⏳ Aggiornamento…';btn.disabled=true;sta.textContent='';
+  const msgs=[];
+  try{
+    const{valore,periodo}=await fetchInflazione();
+    D.inflazione=valore;D.inflazione_periodo=periodo;D.inflazione_ts=new Date().toISOString();
+    msgs.push(`✅ Inflazione ${eP(valore,1)} (${periodoLeggibile(periodo)})`);
+  }catch(e){msgs.push('⚠️ Inflazione BCE non raggiungibile')}
+  TITOLI.forEach(t=>{if(t.tipo==='btp')D.prezziPrec[t.id]=getPrez(t);else D.valMktPrec[t.id]=getVm(t)});
+  let ok=0,fail=0,fn=[];
+  for(const t of TITOLI){
+    if(!t.ticker)continue;
+    try{const p=await fetchYahoo(t.ticker);if(p&&p>0){D.prezzi[t.id]=p;ok++}else throw 0}
+    catch(e){fail++;fn.push(t.nome.split('—')[0].trim())}
+  }
+  if(ok>0)msgs.push(`✅ ${ok} prezzi BTP`);
+  if(fail>0)msgs.push(`⚠️ ${fail} manuali: ${fn.join(', ')}`);
+  const ora=new Date().toLocaleString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  D.tsAggiornamento=ora;salva();rdAll();
+  sta.innerHTML=`<span style="font-size:12px;color:#B0C4DE">${msgs.join(' · ')}</span>`;
+  btn.textContent='🔄 Aggiorna Prezzi e Inflazione';btn.disabled=false;
+}
+
+carica();rdAll();
+(function autoInflazione(){
+  const trentaGiorni=30*24*3600*1000;
+  const vecchio=!D.inflazione_ts||(Date.now()-new Date(D.inflazione_ts).getTime()>trentaGiorni);
+  if(vecchio){
+    fetchInflazione().then(({valore,periodo})=>{
+      D.inflazione=valore;D.inflazione_periodo=periodo;D.inflazione_ts=new Date().toISOString();
+      salva();rdInflBox();
+      document.getElementById('compInfl').textContent=eI(compInfl());
+      document.getElementById('targetCalc').textContent=eI(targetR());
+      rdRiep();rdComp();
+    }).catch(()=>{
+      if(!D.inflazione_periodo)
+        document.getElementById('infl-note').textContent='⚠️ Non raggiungibile · valore memorizzato: '+eP(D.inflazione,1);
+    });
+  }
+})();
+</script>
+</body>
+</html>
