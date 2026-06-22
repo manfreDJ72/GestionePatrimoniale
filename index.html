@@ -149,7 +149,7 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
 <div class="card" id="manuali">
   <div class="card-header"><span class="ico">&#128176;</span><h2>1 &mdash; Dati da Aggiornare</h2></div>
   <div class="card-body">
-    <div class="inp-grid" style="grid-template-columns:1fr 1fr;margin-bottom:16px">
+    <div class="inp-grid" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:16px">
       <div class="inp-item">
         <label>Saldo Conto Corrente oggi (&euro;)</label>
         <div class="infl-box" style="background:var(--giallo);border-color:#D4A000;min-height:92px">
@@ -165,6 +165,14 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
           <div class="infl-etichetta" style="color:#155724">&#128260; Aggiornamento automatico</div>
           <div id="baseSpeseCalc" style="font-size:22px;font-weight:bold;color:var(--verde);text-align:right;margin-top:2px">0 &euro;</div>
           <div style="font-size:11px;color:#388E3C;margin-top:3px">fonte: tabelle inserimento spese</div>
+        </div>
+      </div>
+      <div class="inp-item">
+        <label style="color:var(--verde)">&#8594; Rendita da Titoli e Investimenti</label>
+        <div class="infl-box" style="background:var(--verde-bg);border-color:var(--verde-bd);min-height:92px">
+          <div class="infl-etichetta" style="color:#155724">&#128260; Aggiornamento automatico</div>
+          <div id="renditaCalc" style="font-size:22px;font-weight:bold;color:var(--verde);text-align:right;margin-top:2px">0 &euro;</div>
+          <div style="font-size:11px;color:#388E3C;margin-top:3px">rendita netta annua da titoli</div>
         </div>
       </div>
     </div>
@@ -187,10 +195,10 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
       </div>
       <div class="inp-item">
         <label style="color:var(--verde)">&#8594; Target Rendita (Spese + Inflazione)</label>
-        <div class="infl-box" style="background:var(--verde-bg);border-color:var(--verde-bd);min-height:92px">
-          <div class="infl-etichetta" style="color:#155724">&#128260; Aggiornamento automatico</div>
+        <div class="infl-box" id="target-box" style="background:var(--verde-bg);border-color:var(--verde-bd);min-height:92px">
+          <div class="infl-etichetta" style="color:#155724" id="target-etichetta">&#128260; Aggiornamento automatico</div>
           <div id="targetCalc" style="font-size:22px;font-weight:bold;color:var(--verde);text-align:right;margin-top:2px">0 &euro;</div>
-          <div style="font-size:11px;margin-top:3px" id="targetStatus">&nbsp;</div>
+          <div style="font-size:11px;margin-top:3px;font-weight:bold" id="targetStatus">&nbsp;</div>
         </div>
       </div>
     </div>
@@ -525,6 +533,29 @@ function rdInflBox(){
   }
 }
 
+function rdRenditaBox(){
+  const ren=renditaN(),tar=targetR();
+  const rc=document.getElementById('renditaCalc');
+  if(rc)rc.textContent=eI(ren);
+  const ts=document.getElementById('targetStatus'),tb=document.getElementById('target-box'),te=document.getElementById('target-etichetta');
+  const tc=document.getElementById('targetCalc');
+  if(!ts||!tb)return;
+  const gap=tar-ren;
+  if(tar===0){
+    tb.style.background='var(--verde-bg)';tb.style.borderColor='var(--verde-bd)';
+    if(te)te.style.color='#155724';if(tc)tc.style.color='var(--verde)';
+    ts.textContent=' ';ts.style.color='';
+  }else if(ren>=tar){
+    tb.style.background='var(--verde-bg)';tb.style.borderColor='var(--verde-bd)';
+    if(te)te.style.color='#155724';if(tc)tc.style.color='var(--verde)';
+    ts.textContent='✓ Obiettivo raggiunto';ts.style.color='#155724';
+  }else{
+    tb.style.background='var(--rosso-bg)';tb.style.borderColor='#DC3545';
+    if(te)te.style.color='#721C24';if(tc)tc.style.color='#C00000';
+    ts.textContent='⚠️ Mancano '+eI(gap);ts.style.color='#721C24';
+  }
+}
+
 function rdManuali(){
   document.getElementById('saldoCC').value=D.saldoCC;
   const sp=totSpese().n;
@@ -533,12 +564,7 @@ function rdManuali(){
   document.getElementById('targetCalc').textContent=eI(targetR());
   document.getElementById('ts-ult').textContent=D.tsAggiornamento||'mai aggiornato';
   rdInflBox();
-  const ren=renditaN(),tar=targetR(),ts=document.getElementById('targetStatus');
-  if(ts){
-    if(tar===0){ts.textContent=' ';ts.style.color=''}
-    else if(ren>=tar){ts.textContent='✓ Obiettivo raggiunto';ts.style.color='#155724';ts.style.fontWeight='bold'}
-    else{ts.textContent='⚠️ Obiettivo non raggiunto';ts.style.color='#C00000';ts.style.fontWeight='bold'}
-  }
+  rdRenditaBox();
 }
 
 function rdTitoli(){
@@ -639,6 +665,7 @@ function rdRiep(){
   const s1=document.getElementById('sem1'),i1=document.getElementById('si1'),t1=document.getElementById('st1');
   if(ren>=sp){s1.className='semaforo si';i1.textContent='✅';t1.textContent='SPESE COPERTE — La rendita supera le spese di '+eI(sco)+(ren>=tar?' · copre anche la quota inflazione':' · non copre ancora la quota inflazione ('+eI(ren-tar)+')')}
   else{s1.className='semaforo no';i1.textContent='⚠️';t1.textContent=`RENDITA INSUFFICIENTE — Mancano ${eI(Math.abs(sco))} per coprire le spese`}
+  rdRenditaBox();
 }
 
 function rdApt(){
