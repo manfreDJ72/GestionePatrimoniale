@@ -4,7 +4,7 @@
   "baseSpese": 32000,
   "inflazione": 1.2,
   "inflazione_periodo": "2025-12",
-  "inflazione_ts": "2026-06-22T14:38:34.200Z",
+  "inflazione_ts": "2026-06-22T14:38:48.116Z",
   "prezzi": {},
   "valMkt": {},
   "prezziPrec": {},
@@ -29,5 +29,5 @@
       "spese": []
     }
   ],
-  "_saved": 1782139114200
+  "_saved": 1782139128116
 }
