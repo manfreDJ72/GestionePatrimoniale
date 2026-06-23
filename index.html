@@ -149,14 +149,23 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
 <div class="card" id="manuali">
   <div class="card-header"><span class="ico">&#128176;</span><h2>1 &mdash; Dati da Aggiornare</h2></div>
   <div class="card-body">
-    <div class="inp-grid" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:16px">
+    <div class="inp-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;margin-bottom:16px">
       <div class="inp-item">
-        <label>Saldo Conto Corrente oggi (&euro;)</label>
+        <label>Saldo C/C BPER oggi (&euro;)</label>
         <div class="infl-box" style="background:var(--giallo);border-color:#D4A000;min-height:92px">
           <div class="infl-etichetta" style="color:#7B6A00">&#9998; Aggiornamento manuale</div>
           <input type="number" id="saldoCC" step="0.01" oninput="salvaCalc()"
             style="font-size:22px;font-weight:bold;color:var(--testo);border:none;background:transparent;width:100%;text-align:right;padding:4px 0;font-family:Arial;min-height:auto;margin-top:2px">
           <div style="font-size:11px;color:#7B6A00;margin-top:3px">BPER Deposito Titoli 23036609</div>
+        </div>
+      </div>
+      <div class="inp-item">
+        <label>Saldo C/C Intesa San Paolo (&euro;)</label>
+        <div class="infl-box" style="background:var(--giallo);border-color:#D4A000;min-height:92px">
+          <div class="infl-etichetta" style="color:#7B6A00">&#9998; Aggiornamento manuale</div>
+          <input type="number" id="saldoISP" step="0.01" oninput="salvaCalc()"
+            style="font-size:22px;font-weight:bold;color:var(--testo);border:none;background:transparent;width:100%;text-align:right;padding:4px 0;font-family:Arial;min-height:auto;margin-top:2px">
+          <div style="font-size:11px;color:#7B6A00;margin-top:3px">Intesa San Paolo</div>
         </div>
       </div>
       <div class="inp-item">
@@ -330,7 +339,7 @@ const APT_DEFAULT=[
 ];
 
 let D={
-  saldoCC:128957.56, certificate:50000, baseSpese:32000,
+  saldoCC:128957.56, saldoISP:0, certificate:50000, baseSpese:32000,
   inflazione:1.5, inflazione_periodo:null, inflazione_ts:null,
   prezzi:{}, valMkt:{}, prezziPrec:{}, valMktPrec:{},
   tsAggiornamento:null,
@@ -373,7 +382,7 @@ function salva(){
 }
 
 function applicaDati(p){
-  ['saldoCC','certificate','baseSpese','inflazione','inflazione_periodo','inflazione_ts',
+  ['saldoCC','saldoISP','certificate','baseSpese','inflazione','inflazione_periodo','inflazione_ts',
    'prezzi','valMkt','prezziPrec','valMktPrec','tsAggiornamento','_saved'].forEach(k=>{if(p[k]!==undefined)D[k]=p[k]});
   if(p.customTitoli&&Array.isArray(p.customTitoli))D.customTitoli=p.customTitoli;
   D.esclusi={};
@@ -464,7 +473,7 @@ function totT(){
   return{vm,rl,tx,rn};
 }
 
-function patrimonio(){return totT().vm+D.saldoCC}
+function patrimonio(){return totT().vm+D.saldoCC+(D.saldoISP||0)}
 function renditaN(){return totT().rn}
 function compInfl(){return patrimonio()*(D.inflazione/100)}
 function targetR(){return totSpese().n+compInfl()}
@@ -558,6 +567,7 @@ function rdRenditaBox(){
 
 function rdManuali(){
   document.getElementById('saldoCC').value=D.saldoCC;
+  document.getElementById('saldoISP').value=D.saldoISP||0;
   const sp=totSpese().n;
   document.getElementById('baseSpeseCalc').textContent=sp>0?eI(sp):'0 €';
   document.getElementById('compInfl').textContent=eI(compInfl());
@@ -753,6 +763,7 @@ function rdAll(){rdManuali();rdTitoli();rdRiep();rdApt();rdComp()}
 
 function salvaCalc(){
   D.saldoCC=parseFloat(document.getElementById('saldoCC').value)||0;
+  D.saldoISP=parseFloat(document.getElementById('saldoISP').value)||0;
   salva();
   rdManuali();
   rdTitoli();rdRiep();rdComp();
