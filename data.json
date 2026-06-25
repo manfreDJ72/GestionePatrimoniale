@@ -1,6 +1,6 @@
 {
   "saldoCC": 97125.25,
-  "saldoISP": 34676.15,
+  "saldoISP": 34676,
   "certificate": 50000,
   "baseSpese": 32000,
   "inflazione": 1.2,
@@ -199,5 +199,5 @@
       ]
     }
   ],
-  "_saved": 1782230086161
+  "_saved": 1782374927707
 }
