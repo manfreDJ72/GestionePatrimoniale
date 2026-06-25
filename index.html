@@ -321,15 +321,52 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
 </main>
 <script>
 const TITOLI=[
-  {id:'t2',cat:'Titoli di Stato',nome:'BTP 7,25% — scad. 11/2026',isin:'IT0001086567',ticker:'IT0001086567.MI',tipo:'btp',nominale:59316.48,cedola:0.0725,aliq:0.125,prezDef:101.77,prezAcquisto:100,link:'https://www.borsaitaliana.it/borsa/titoli-di-stato/btp/scheda/IT0001086567.html'},
-  {id:'t3',cat:'Titoli di Stato',nome:'BTP Valore 3,25%→4% — scad. 03/2030',isin:'IT0005583486',ticker:'IT0005583486.MI',tipo:'btp',nominale:50000,cedola:0.0325,aliq:0.125,prezDef:102.32,prezAcquisto:100,link:'https://www.borsaitaliana.it/borsa/titoli-di-stato/btp/scheda/IT0005583486.html'},
-  {id:'t4',cat:'Titoli di Stato',nome:'BTP Valore 4% — scad. 06/2027',isin:'IT0005547408',ticker:'IT0005547408.MI',tipo:'btp',nominale:150000,cedola:0.04,aliq:0.125,prezDef:101.17,prezAcquisto:100,link:'https://www.borsaitaliana.it/borsa/titoli-di-stato/btp/scheda/IT0005547408.html'},
-  {id:'t5',cat:'Fondo',nome:'JPM Flexible Credit D EUR',isin:'LU0562087980',ticker:null,tipo:'fondo',cedola:0.0594,aliq:0.26,vmDef:199827.65,link:null},
-  {id:'t6',cat:'Fondo',nome:'JPM Global Income D EUR',isin:'LU0404220724',ticker:null,tipo:'fondo',cedola:0.0519,aliq:0.26,vmDef:170000,link:null},
-  {id:'t7',cat:'Fondo',nome:'JPM Europe High Yield Bond D EUR',isin:'LU1549373071',ticker:null,tipo:'fondo',cedola:0.04,aliq:0.26,vmDef:230000,link:null},
-  {id:'t8',cat:'Certificate',nome:'BPER Protection Memory Coupon',isin:'IT0005709875',ticker:null,tipo:'fondo',cedola:0.045,aliq:0,vmDef:50000,link:null},
-  {id:'t9',cat:'Conto Deposito',nome:'Conto Deposito Vincolato BPER',isin:'',ticker:null,tipo:'fondo',cedola:0.033,aliq:0.26,vmDef:100000,link:null},
-  {id:'t10',cat:'Fondo',nome:'Fondo Peer',isin:'',ticker:null,tipo:'fondo',cedola:0.04,aliq:0,vmDef:40000,link:null}
+  // ── Titoli di Stato ── (dati PDF BPER Deposito 23036609 del 25/06/2026)
+  {id:'t2',cat:'Titoli di Stato',nome:'BTP 7,25% — scad. 11/2026',
+   isin:'IT0001086567',ticker:'IT0001086567.MI',tipo:'btp',
+   nominale:59316.48,cedola:0.0725,aliq:0.125,
+   prezDef:101.66,prezAcquisto:126.59,
+   link:'https://www.borsaitaliana.it/borsa/titoli-di-stato/btp/scheda/IT0001086567.html'},
+  {id:'t3',cat:'Titoli di Stato',nome:'BTP Valore 3,25%→4% — scad. 03/2030',
+   isin:'IT0005583486',ticker:'IT0005583486.MI',tipo:'btp',
+   nominale:50000,cedola:0.0325,aliq:0.125,
+   prezDef:102.59,prezAcquisto:100,
+   link:'https://www.borsaitaliana.it/borsa/titoli-di-stato/btp/scheda/IT0005583486.html'},
+  {id:'t4',cat:'Titoli di Stato',nome:'BTP Valore 4% — scad. 06/2027',
+   isin:'IT0005547408',ticker:'IT0005547408.MI',tipo:'btp',
+   nominale:150000,cedola:0.04,aliq:0.125,
+   prezDef:101.19,prezAcquisto:100,
+   link:'https://www.borsaitaliana.it/borsa/titoli-di-stato/btp/scheda/IT0005547408.html'},
+  // ── Fondi JPMorgan ── (quote/prezzi/carico da PDF del 25/06/2026)
+  {id:'t5',cat:'Fondo',nome:'JPM Flexible Credit D EUR',
+   isin:'LU0562087980',ticker:null,tipo:'fondo',
+   cedola:0.0594,aliq:0.26,
+   vmDef:200316.15,vmCarico:199805.16,
+   link:'https://fundinfo.com/fund/lu0562087980'},
+  {id:'t6',cat:'Fondo',nome:'JPM Global Income D EUR',
+   isin:'LU0404220724',ticker:null,tipo:'fondo',
+   cedola:0.0519,aliq:0.26,
+   vmDef:168622.58,vmCarico:99480.09,
+   link:'https://fundinfo.com/fund/lu0404220724'},
+  {id:'t7',cat:'Fondo',nome:'JPM Europe High Yield Bond D EUR',
+   isin:'LU1549373071',ticker:null,tipo:'fondo',
+   cedola:0.04,aliq:0.26,
+   vmDef:220091.54,vmCarico:149977.47,
+   link:'https://fundinfo.com/fund/lu1549373071'},
+  // ── Certificate ──
+  {id:'t8',cat:'Certificate',nome:'BPER Protection Memory Coupon',
+   isin:'IT0005709875',ticker:null,tipo:'fondo',
+   cedola:0.045,aliq:0,vmDef:50000,link:null},
+  // ── Conto Deposito ──
+  {id:'t9',cat:'Conto Deposito',nome:'Conto Deposito Vincolato BPER',
+   isin:'',ticker:null,tipo:'fondo',
+   cedola:0.033,aliq:0.26,vmDef:100000,link:null},
+  // ── Arca Bond Target 2031 ── (Deposito 6344735, 5.000 quote, utente conferma 50.000€)
+  {id:'t10',cat:'Fondo',nome:'Arca Bond Target 2031 — Reddito Dis.',
+   isin:'',ticker:null,tipo:'fondo',
+   cedola:0.04,aliq:0,
+   vmDef:50000,vmCarico:50000,
+   link:'https://www.arcafondi.it/en/funds/arca-bond-target-2031'},
 ];
 
 const APT_DEFAULT=[
@@ -602,7 +639,7 @@ function rdTitoli(){
         ${D.prezziPrec[t.id]?`<div style="font-size:11px;color:#888;margin-top:2px;text-align:right">Da ieri: ${dP.txt}</div>`:''}
       </div>`;
     }else if(t.id==='t9'){
-      const vm=getVm(t),investito=t.vmDef||0,pls=plusStr(vm,investito);
+      const vm=getVm(t),investito=t.vmCarico!==undefined?t.vmCarico:(t.vmDef||0),pls=plusStr(vm,investito);
       boxH=`<div class="fondo-box" style="min-width:195px">
         <div class="fondo-etichetta">Conto Deposito &#9998; aggiorna</div>
         ${rowH('Investito',eI(investito),true).replace('#5a8fc4','#7B6A00').replace('#555','#7B3F00')}
@@ -611,15 +648,15 @@ function rdTitoli(){
         <div class="prez-delta ${pls.cls}" style="margin-top:3px">${pls.txt}</div>
       </div>`;
     }else{
-      const vm=getVm(t),investito=t.vmDef||0,pls=plusStr(vm,investito);
+      const vm=getVm(t),investito=t.vmCarico!==undefined?t.vmCarico:(t.vmDef||0),pls=plusStr(vm,investito);
       boxH=`<div class="prez-box" style="min-width:195px">
-        <div class="prez-etichetta">Fondo &mdash; valore mercato</div>
-        ${rowH('Investito',eI(investito),true)}
+        <div class="prez-etichetta">Fondo &mdash; carico / mercato</div>
+        ${rowH('Investito (carico)',eI(investito),true)}
         ${rowH('Oggi',eI(vm),false)}
         <div class="prez-delta ${pls.cls}" style="margin-top:3px">${pls.txt}</div>
       </div>`;
     }
-    const linkH=t.link?`<a href="${t.link}" target="_blank" style="font-size:19px;text-decoration:none;vertical-align:middle" title="Borsa Italiana">🔗</a>`:'';
+    const linkH=t.link?`<a href="${t.link}" target="_blank" style="font-size:19px;text-decoration:none;vertical-align:middle" title="Scheda fondo/titolo">🔗</a>`:'';
     let azioneH;
     if(isCustom){
       azioneH=`<button class="btn-del" onclick="delCustom('${t.id}')" title="Rimuovi posizione simulata" style="font-size:14px">✕ Rimuovi</button>`;
