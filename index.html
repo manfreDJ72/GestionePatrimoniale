@@ -47,7 +47,7 @@ input:focus,select:focus{outline:none;border-color:var(--blu-md)}
 .inp-item .nota{font-size:13px;color:#888;font-style:italic}
 .calc-val{background:var(--verde-bg);border:2px solid var(--verde-bd);border-radius:6px;padding:9px 14px;font-size:20px;font-weight:bold;color:var(--verde);text-align:right;min-height:44px;display:flex;align-items:center;justify-content:flex-end}
 .calc-val.blu{background:var(--blu-bg);border-color:var(--blu-md);color:var(--blu-md)}
-.tbl-wrap{overflow-x:auto}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:collapse;font-size:15px}
 th{background:var(--blu);color:#fff;padding:9px 11px;text-align:center;font-size:13px;font-weight:bold;white-space:nowrap}
 td{padding:9px 11px;border-bottom:1px solid var(--grigio-bd);vertical-align:middle}
@@ -101,7 +101,7 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
 .btn-del{background:none;border:none;color:#DC3545;cursor:pointer;font-size:17px;padding:3px 8px;line-height:1}
 .comp-row{display:flex;justify-content:space-between;align-items:center;padding:13px 18px;border-bottom:1px solid var(--grigio-bd);font-size:17px}
 .comp-row:last-child{border-bottom:none}
-.comp-lbl{font-weight:bold;color:var(--blu)}
+.comp-lbl{font-weight:bold;color:var(--blu);flex:1;min-width:0;padding-right:8px}
 .comp-val{font-weight:bold;font-size:19px}
 .comp-val.vd{color:#155724}.comp-val.rs{color:#C00000}
 /* Simulazione */
@@ -115,8 +115,39 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
 .vendi-btn:hover{background:#F8D7DA}
 .includi-btn{background:none;border:1.5px solid #28A745;color:#155724;border-radius:12px;padding:4px 10px;cursor:pointer;font-size:12px;white-space:nowrap;font-family:Arial;transition:background .15s}
 .includi-btn:hover{background:#D4EDDA}
+.grid-4col{grid-template-columns:repeat(4,1fr)}
+.grid-3col{grid-template-columns:repeat(3,1fr)}
 @media print{#header{position:static}.nav-btn{display:none}body{background:#fff;font-size:12px}.card{box-shadow:none;border:1px solid #ccc}}
-@media(max-width:600px){.kpi-grid{grid-template-columns:1fr 1fr}.kpi-val{font-size:19px}th,td{padding:7px 5px;font-size:13px}}
+@media(max-width:900px){
+  .grid-4col{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:720px){
+  .grid-3col{grid-template-columns:repeat(2,1fr)}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .kpi-val{font-size:20px}
+  .card-body{padding:14px}
+  main{padding:14px 10px}
+}
+@media(max-width:500px){
+  #header{padding:12px 16px 10px}
+  #header h1{font-size:18px}
+  #header .sub{font-size:11px;margin-bottom:6px}
+  .nav-btn{padding:5px 9px;font-size:12px}
+  .grid-4col{grid-template-columns:1fr 1fr}
+  .grid-3col{grid-template-columns:1fr 1fr}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .kpi-val{font-size:17px}
+  .infl-val{font-size:20px}
+  .infl-box{padding:8px 10px;min-height:unset}
+  th,td{padding:7px 5px;font-size:13px}
+  .comp-row{padding:10px 12px;font-size:14px;flex-wrap:wrap}
+  .comp-val{font-size:15px}
+  .comp-lbl{font-size:13px}
+  .semaforo{font-size:15px;padding:12px}
+  main{padding:10px 8px}
+  .card-body{padding:12px}
+  .kpi-box{padding:11px 12px}
+}
 </style>
 </head>
 <body>
@@ -149,7 +180,7 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
 <div class="card" id="manuali">
   <div class="card-header"><span class="ico">&#128176;</span><h2>1 &mdash; Dati da Aggiornare</h2></div>
   <div class="card-body">
-    <div class="inp-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;margin-bottom:16px">
+    <div class="inp-grid grid-4col" style="margin-bottom:16px">
       <div class="inp-item">
         <label>Saldo C/C BPER oggi (&euro;)</label>
         <div class="infl-box" style="background:var(--giallo);border-color:#D4A000;min-height:92px">
@@ -185,7 +216,7 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
         </div>
       </div>
     </div>
-    <div class="inp-grid" style="grid-template-columns:1fr 1fr 1fr">
+    <div class="inp-grid grid-3col">
       <div class="inp-item">
         <label style="color:var(--verde)">Inflazione IPCA Italia &mdash; Fonte: BCE</label>
         <div class="infl-box" id="infl-box" style="min-height:92px">
