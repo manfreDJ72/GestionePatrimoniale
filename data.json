@@ -200,7 +200,7 @@
     }
   ],
   "cf": {
-    "inps": 9750,
+    "inps": 9600,
     "inpsExtra": [],
     "pensioneFR": 250,
     "pensioneMamma": 600,
@@ -213,5 +213,5 @@
     ],
     "cedoleMesi": {}
   },
-  "_saved": 1782922706211
+  "_saved": 1782922749645
 }
