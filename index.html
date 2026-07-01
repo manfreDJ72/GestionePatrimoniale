@@ -160,6 +160,7 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
     <a href="#riepilogo" class="nav-btn">&#128200; Riepilogo</a>
     <a href="#appartamenti" class="nav-btn">&#127968; Appartamenti</a>
     <a href="#compensazione" class="nav-btn">&#9878;&#65039; Compensazione</a>
+    <a href="#cashflow" class="nav-btn">&#128197; Piano di Cassa</a>
     <button class="nav-btn primary" onclick="aggiornaTutto()" id="btn-agg">&#128260; Aggiorna Prezzi e Inflazione</button>
     <button class="nav-btn" onclick="esportaDati()" style="background:rgba(40,167,69,.3);border-color:rgba(40,167,69,.7)">&#11015; Esporta Dati</button>
     <button class="nav-btn" onclick="importaDati()" style="background:rgba(0,100,255,.2);border-color:rgba(50,150,255,.6)">&#11014; Importa Dati</button>
@@ -345,6 +346,101 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
     <div class="semaforo nd" id="sem2"><span class="sem-ico" id="si2">&#8987;</span><span id="st2">Inserire le spese per la valutazione</span></div>
   </div>
 </div>
+<!-- 6. PIANO DI CASSA ANNUALE -->
+<div class="card" id="cashflow">
+  <div class="card-header verde"><span class="ico">&#128197;</span><h2>6 &mdash; Piano di Cassa Annuale</h2></div>
+  <div class="card-body">
+    <p style="font-size:13px;color:#555;margin-bottom:14px;background:#E8F4FF;padding:8px 12px;border-radius:5px;border-left:4px solid var(--blu-md)">
+      Flusso mensile di cassa: pensioni + cedole vs spese. Le cedole vengono distribuite nei mesi configurati per ogni strumento. I mesi con doppia rata INPS e spese doppie sono evidenziati.
+    </p>
+    <!-- Pensioni e incassi fissi -->
+    <div style="font-weight:bold;color:var(--blu);font-size:14px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.3px">&#128176; Entrate Fisse</div>
+    <div class="inp-grid grid-4col" style="margin-bottom:16px">
+      <div class="inp-item">
+        <label>Pensione INPS — importo per rata (&euro;)</label>
+        <input type="number" id="cf-inps" step="50" min="0" class="inp-m" oninput="salvaCF()">
+        <span class="nota">Mesi con extrarata (es. <em>1,12</em>):&nbsp;<input type="text" id="cf-inps-extra" placeholder="1,12" oninput="salvaCF()" style="width:72px;font-size:13px;padding:3px 7px;min-height:unset;display:inline-block;vertical-align:middle"></span>
+      </div>
+      <div class="inp-item">
+        <label>Pensione Francia (&euro;/mese)</label>
+        <input type="number" id="cf-fr" step="50" min="0" class="inp-m" oninput="salvaCF()">
+        <span class="nota">Totale annuo &#8776; 3.000 &euro;</span>
+      </div>
+      <div class="inp-item">
+        <label>Pensione reversibilit&agrave; (&euro;/mese)</label>
+        <input type="number" id="cf-mamma" step="50" min="0" class="inp-m" oninput="salvaCF()">
+      </div>
+      <div class="inp-item">
+        <label>Indennizzo Unilever (&euro;/anno) &mdash; mese:&nbsp;<input type="number" id="cf-uni-mese" min="1" max="12" step="1" oninput="salvaCF()" style="width:52px;font-size:14px;padding:3px 6px;min-height:unset;display:inline-block;vertical-align:middle"></label>
+        <input type="number" id="cf-uni" step="500" min="0" class="inp-m" oninput="salvaCF()">
+      </div>
+    </div>
+    <!-- Spese vita + sommari -->
+    <div style="font-weight:bold;color:#721C24;font-size:14px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.3px">&#128176; Spese di Vita</div>
+    <div class="inp-grid grid-3col" style="margin-bottom:18px">
+      <div class="inp-item">
+        <label>Spese di vita annue (&euro;)</label>
+        <input type="number" id="cf-spvita" step="500" min="0" class="inp-m" oninput="salvaCF()">
+        <span class="nota">Mesi con spesa doppia (es. <em>8,12</em>):&nbsp;<input type="text" id="cf-spvita-double" placeholder="8,12" oninput="salvaCF()" style="width:72px;font-size:13px;padding:3px 7px;min-height:unset;display:inline-block;vertical-align:middle"></span>
+      </div>
+      <div class="inp-item">
+        <label style="color:var(--verde)">&#8594; Totale entrate annue previste</label>
+        <div class="calc-val" id="cf-tot-entrate">&mdash;</div>
+      </div>
+      <div class="inp-item">
+        <label style="color:#721C24">&#8594; Totale uscite annue previste</label>
+        <div class="calc-val" style="background:var(--rosso-bg);border-color:#DC3545;color:#721C24" id="cf-tot-uscite">&mdash;</div>
+      </div>
+    </div>
+    <!-- Tabella mensile -->
+    <div class="tbl-wrap">
+      <table id="cf-tbl" style="font-size:14px">
+        <thead><tr>
+          <th style="text-align:left;min-width:90px">Mese</th>
+          <th style="min-width:105px">INPS</th>
+          <th style="min-width:95px">Fr. / Rev.</th>
+          <th style="min-width:90px">Unilever</th>
+          <th style="min-width:100px">Cedole</th>
+          <th style="min-width:110px;background:#155724">&#9654; ENTRATE</th>
+          <th style="min-width:100px">Spese Vita</th>
+          <th style="min-width:100px">Spese Appt.</th>
+          <th style="min-width:110px;background:#721C24">&#9654; USCITE</th>
+          <th style="min-width:110px">SALDO</th>
+          <th style="min-width:110px">Cumulato</th>
+        </tr></thead>
+        <tbody id="cf-tbody"></tbody>
+        <tfoot><tr class="tot-row">
+          <td style="text-align:left">TOTALE ANNO</td>
+          <td class="td-num" id="cf-t-inps"></td>
+          <td class="td-num" id="cf-t-pens"></td>
+          <td class="td-num" id="cf-t-uni"></td>
+          <td class="td-num" id="cf-t-ced"></td>
+          <td class="td-num" id="cf-t-ent"></td>
+          <td class="td-num" id="cf-t-spv"></td>
+          <td class="td-num" id="cf-t-spa"></td>
+          <td class="td-num" id="cf-t-usc"></td>
+          <td class="td-num" id="cf-t-sal"></td>
+          <td></td>
+        </tr></tfoot>
+      </table>
+    </div>
+    <!-- Calendario cedole per strumento -->
+    <div style="margin-top:20px">
+      <div style="font-weight:bold;color:var(--blu);margin-bottom:8px;font-size:14px">&#128197; Calendario Cedole / Distribuzioni &mdash; seleziona i mesi di pagamento per ogni strumento</div>
+      <div class="tbl-wrap">
+        <table style="font-size:13px">
+          <thead><tr>
+            <th style="text-align:left;min-width:180px">Strumento</th>
+            <th style="text-align:left">Mesi di pagamento</th>
+            <th style="min-width:120px">Rendita netta/anno</th>
+          </tr></thead>
+          <tbody id="cf-cedole-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer style="text-align:center;color:#999;font-size:13px;padding:20px 0 40px">
   Inflazione: BCE (IPCA Italia) &bull; Prezzi BTP: Yahoo Finance / Borsa Italiana<br>
   <strong style="color:#555">Come condividere i dati:</strong> clicca &#11015; <strong>Esporta Dati</strong> &rarr; invia il file JSON via email &rarr; il destinatario clicca &#11014; <strong>Importa Dati</strong>
@@ -356,46 +452,46 @@ const TITOLI=[
   {id:'t2',cat:'Titoli di Stato',nome:'BTP 7,25% — scad. 11/2026',
    isin:'IT0001086567',ticker:'IT0001086567.MI',tipo:'btp',
    nominale:59316.48,cedola:0.0725,aliq:0.125,
-   prezDef:101.66,prezAcquisto:126.59,
+   prezDef:101.66,prezAcquisto:126.59,mesiCedola:[5,11],
    link:'https://www.borsaitaliana.it/borsa/titoli-di-stato/btp/scheda/IT0001086567.html'},
   {id:'t3',cat:'Titoli di Stato',nome:'BTP Valore 3,25%→4% — scad. 03/2030',
    isin:'IT0005583486',ticker:'IT0005583486.MI',tipo:'btp',
    nominale:50000,cedola:0.0325,aliq:0.125,
-   prezDef:102.59,prezAcquisto:100,
+   prezDef:102.59,prezAcquisto:100,mesiCedola:[3,6,9,12],
    link:'https://www.borsaitaliana.it/borsa/titoli-di-stato/btp/scheda/IT0005583486.html'},
   {id:'t4',cat:'Titoli di Stato',nome:'BTP Valore 4% — scad. 06/2027',
    isin:'IT0005547408',ticker:'IT0005547408.MI',tipo:'btp',
    nominale:150000,cedola:0.04,aliq:0.125,
-   prezDef:101.19,prezAcquisto:100,
+   prezDef:101.19,prezAcquisto:100,mesiCedola:[3,6,9,12],
    link:'https://www.borsaitaliana.it/borsa/titoli-di-stato/btp/scheda/IT0005547408.html'},
   // ── Fondi JPMorgan ── (quote/prezzi/carico da PDF del 25/06/2026)
   {id:'t5',cat:'Fondo',nome:'JPM Flexible Credit D EUR',
    isin:'LU0562087980',ticker:null,tipo:'fondo',
-   cedola:0.0594,aliq:0.26,
+   cedola:0.0594,aliq:0.26,mesiCedola:[1,2,3,4,5,6,7,8,9,10,11,12],
    vmDef:200316.15,vmCarico:199805.16,
    link:'https://fundinfo.com/fund/lu0562087980'},
   {id:'t6',cat:'Fondo',nome:'JPM Global Income D EUR',
    isin:'LU0404220724',ticker:null,tipo:'fondo',
-   cedola:0.0519,aliq:0.26,
+   cedola:0.0519,aliq:0.26,mesiCedola:[3,6,9,12],
    vmDef:168622.58,vmCarico:99480.09,
    link:'https://fundinfo.com/fund/lu0404220724'},
   {id:'t7',cat:'Fondo',nome:'JPM Europe High Yield Bond D EUR',
    isin:'LU1549373071',ticker:null,tipo:'fondo',
-   cedola:0.04,aliq:0.26,
+   cedola:0.04,aliq:0.26,mesiCedola:[3,6,9,12],
    vmDef:220091.54,vmCarico:149977.47,
    link:'https://fundinfo.com/fund/lu1549373071'},
   // ── Certificate ──
   {id:'t8',cat:'Certificate',nome:'BPER Protection Memory Coupon',
    isin:'IT0005709875',ticker:null,tipo:'fondo',
-   cedola:0.045,aliq:0,vmDef:50000,link:null},
+   cedola:0.045,aliq:0,vmDef:50000,mesiCedola:[3,6,9,12],link:null},
   // ── Conto Deposito ──
   {id:'t9',cat:'Conto Deposito',nome:'Conto Deposito Vincolato BPER',
    isin:'',ticker:null,tipo:'fondo',
-   cedola:0.033,aliq:0.26,vmDef:100000,link:null},
+   cedola:0.033,aliq:0.26,vmDef:100000,mesiCedola:[12],link:null},
   // ── Arca Bond Target 2031 ── (Deposito 6344735, 5.000 quote, utente conferma 50.000€)
   {id:'t10',cat:'Fondo',nome:'Arca Bond Target 2031 — Reddito Dis.',
    isin:'',ticker:null,tipo:'fondo',
-   cedola:0.04,aliq:0,
+   cedola:0.04,aliq:0,mesiCedola:[3,9],
    vmDef:50000,vmCarico:50000,
    link:'https://www.arcafondi.it/en/funds/arca-bond-target-2031'},
 ];
@@ -406,13 +502,26 @@ const APT_DEFAULT=[
   {nome:'Spese Generali',               tipo:'gen', spese:[]}
 ];
 
+const CF_DEFAULT={
+  inps:9750,          // importo per rata INPS
+  inpsExtra:[1,12],   // mesi con extrarata (tredicesima/quattordicesima)
+  pensioneFR:250,     // pensione Francia €/mese (3.000€/anno ÷ 12)
+  pensioneMamma:600,  // pensione reversibilità €/mese
+  unilever:10500,     // indennizzo Unilever €/anno
+  unilevermese:5,     // mese di accredito Unilever (5 = maggio)
+  speseVita:65000,    // spese di vita annue €
+  speseVitaDouble:[8,12], // mesi con spesa doppia (agosto e dicembre)
+  cedoleMesi:{}       // override mesi cedola per strumento {id:[mesi]}
+};
+
 let D={
   saldoCC:128957.56, saldoISP:0, certificate:50000, baseSpese:32000,
   inflazione:1.5, inflazione_periodo:null, inflazione_ts:null,
   prezzi:{}, valMkt:{}, prezziPrec:{}, valMktPrec:{},
   tsAggiornamento:null,
   customTitoli:[], esclusi:{},
-  apt:JSON.parse(JSON.stringify(APT_DEFAULT))
+  apt:JSON.parse(JSON.stringify(APT_DEFAULT)),
+  cf:JSON.parse(JSON.stringify(CF_DEFAULT))
 };
 
 /* ── GITHUB SYNC ── */
@@ -455,6 +564,7 @@ function applicaDati(p){
   if(p.customTitoli&&Array.isArray(p.customTitoli))D.customTitoli=p.customTitoli;
   D.esclusi={};
   if(p.apt&&p.apt.length===3&&p.apt[0].tipo!==undefined)D.apt=p.apt;
+  if(p.cf&&typeof p.cf==='object')D.cf=p.cf;
 }
 
 function carica(){
@@ -827,24 +937,178 @@ function rdComp(){
   else{s2.className='semaforo no';i2.textContent='⚠️';t2.textContent='ATTENZIONE — La rendita non copre le spese (mancano '+eI(sp.n-ren)+')'}
 }
 
-function rdAll(){rdManuali();rdTitoli();rdRiep();rdApt();rdComp()}
+/* ── PIANO DI CASSA ── */
+const MESI_IT=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+const MESI_S=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+
+function getCF(k){return (D.cf&&D.cf[k]!==undefined)?D.cf[k]:CF_DEFAULT[k]}
+
+function calcCFMese(m){
+  const inpsAmt=getCF('inps');
+  const inpsExtra=getCF('inpsExtra');
+  const inps=inpsAmt*(1+(inpsExtra.includes(m)?1:0));
+  const fr=getCF('pensioneFR');
+  const mamma=getCF('pensioneMamma');
+  const uniAmt=getCF('unilever'),uniMese=getCF('unilevermese');
+  const unilever=uniMese===m?uniAmt:0;
+  // Cedole strumenti
+  let cedole=0;
+  const overrideMesi=(D.cf&&D.cf.cedoleMesi)||{};
+  const allT=[...TITOLI,...(D.customTitoli||[])].filter(t=>!D.esclusi[t.id]);
+  allT.forEach(t=>{
+    const mesi=overrideMesi[t.id]||t.mesiCedola||[];
+    if(!mesi.includes(m))return;
+    const c=calcT(t);
+    cedole+=c.rn/mesi.length;
+  });
+  // Spese vita
+  const spVitaA=getCF('speseVita');
+  const spDouble=getCF('speseVitaDouble');
+  const nD=spDouble.length;
+  const baseV=spVitaA/(12+nD);
+  const spVita=spDouble.includes(m)?baseV*2:baseV;
+  // Spese appartamenti: distribuite uniformemente
+  const spApt=totSpese().n/12;
+  const entrate=inps+fr+mamma+unilever+cedole;
+  const uscite=spVita+spApt;
+  return{inps,fr,mamma,unilever,cedole,entrate,spVita,spApt,uscite,saldo:entrate-uscite};
+}
+
+function rdCashFlow(){
+  // Popola input
+  const s=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v};
+  s('cf-inps',getCF('inps'));
+  s('cf-fr',getCF('pensioneFR'));
+  s('cf-mamma',getCF('pensioneMamma'));
+  s('cf-uni',getCF('unilever'));
+  s('cf-uni-mese',getCF('unilevermese'));
+  s('cf-spvita',getCF('speseVita'));
+  s('cf-inps-extra',getCF('inpsExtra').join(','));
+  s('cf-spvita-double',getCF('speseVitaDouble').join(','));
+  // Costruisce tabella
+  const tbody=document.getElementById('cf-tbody');
+  if(!tbody)return;
+  tbody.innerHTML='';
+  let cumul=0,tI=0,tFR=0,tM=0,tU=0,tC=0,tE=0,tSV=0,tSA=0,tUS=0,tS=0;
+  const inpsExtra=getCF('inpsExtra');
+  const uniMese=getCF('unilevermese');
+  const spDouble=getCF('speseVitaDouble');
+  for(let m=1;m<=12;m++){
+    const r=calcCFMese(m);
+    cumul+=r.saldo;
+    tI+=r.inps;tFR+=r.fr;tM+=r.mamma;tU+=r.unilever;tC+=r.cedole;
+    tE+=r.entrate;tSV+=r.spVita;tSA+=r.spApt;tUS+=r.uscite;tS+=r.saldo;
+    const isInpsExtra=inpsExtra.includes(m);
+    const isUni=uniMese===m;
+    const isSpDouble=spDouble.includes(m);
+    const saldoCls=r.saldo>=0?'color:#155724':'color:#C00000';
+    const cumulCls=cumul>=0?'color:#155724':'color:#C00000';
+    const bg=isInpsExtra||isUni||isSpDouble?'background:#FFFDE7;':'';
+    tbody.insertAdjacentHTML('beforeend',`<tr style="${bg}">
+      <td style="white-space:nowrap;font-weight:bold;font-size:13px">${MESI_IT[m-1]}${isInpsExtra?'<br><span style="font-size:10px;background:#D6E4F0;color:#1F3864;padding:1px 4px;border-radius:3px">extrarata</span>':''}</td>
+      <td class="td-num">${eI(r.inps)}</td>
+      <td class="td-num" style="font-size:12px">${eI(r.fr)}<br><span style="color:#888">${eI(r.mamma)}</span></td>
+      <td class="td-num">${isUni?`<strong style="color:#B8360A">${eI(r.unilever)}</strong>`:'<span style="color:#ccc">—</span>'}</td>
+      <td class="td-num" style="color:#1565C0">${r.cedole>0?eI(r.cedole):'<span style="color:#ccc">—</span>'}</td>
+      <td class="td-num" style="font-weight:bold;background:#D4EDDA;color:#155724">${eI(r.entrate)}</td>
+      <td class="td-num" style="font-size:12px;color:#721C24">${eI(r.spVita)}${isSpDouble?'<br><span style="font-size:10px;background:#F8D7DA;padding:1px 4px;border-radius:3px">doppio</span>':''}</td>
+      <td class="td-num" style="font-size:12px;color:#721C24">${r.spApt>0?eI(r.spApt):'<span style="color:#ccc">—</span>'}</td>
+      <td class="td-num" style="font-weight:bold;background:#F8D7DA;color:#721C24">${eI(r.uscite)}</td>
+      <td class="td-num" style="font-weight:bold;font-size:15px;${saldoCls}">${r.saldo>=0?'+':''}${eI(r.saldo)}</td>
+      <td class="td-num" style="font-size:13px;${cumulCls}">${cumul>=0?'+':''}${eI(cumul)}</td>
+    </tr>`);
+  }
+  // Totali
+  const setT=(id,v,stl)=>{const e=document.getElementById(id);if(e){e.textContent=v;if(stl)e.style.color=stl}};
+  setT('cf-t-inps',eI(tI));
+  setT('cf-t-pens',eI(tFR+tM));
+  setT('cf-t-uni',tU>0?eI(tU):'—');
+  setT('cf-t-ced',eI(tC));
+  setT('cf-t-ent',eI(tE));
+  setT('cf-t-spv',eI(tSV));
+  setT('cf-t-spa',tSA>0?eI(tSA):'—');
+  setT('cf-t-usc',eI(tUS));
+  setT('cf-t-sal',(tS>=0?'+':'')+eI(tS),tS>=0?'#90EE90':'#FFAAAA');
+  // Sommari
+  const te=document.getElementById('cf-tot-entrate'),tu=document.getElementById('cf-tot-uscite');
+  if(te)te.textContent=eI(tE);
+  if(tu)tu.textContent=eI(tUS);
+  // Tabella cedole
+  rdCFCedoleDetail();
+}
+
+function rdCFCedoleDetail(){
+  const tbody=document.getElementById('cf-cedole-tbody');
+  if(!tbody)return;
+  tbody.innerHTML='';
+  const overrideMesi=(D.cf&&D.cf.cedoleMesi)||{};
+  const allT=[...TITOLI,...(D.customTitoli||[])].filter(t=>!D.esclusi[t.id]&&(t.cedola||0)>0);
+  allT.forEach(t=>{
+    const mesi=overrideMesi[t.id]||t.mesiCedola||[];
+    const c=calcT(t);
+    const checks=MESI_S.map((ms,i)=>{
+      const m=i+1,ck=mesi.includes(m)?'checked':'';
+      return`<label style="cursor:pointer;display:inline-block;margin:0 4px 3px 0;white-space:nowrap">
+        <input type="checkbox" ${ck} onchange="cfToggleMese('${t.id}',${m},this.checked)" style="margin:0 2px 0 0;cursor:pointer">
+        <span style="font-size:11px">${ms}</span></label>`;
+    }).join('');
+    tbody.insertAdjacentHTML('beforeend',`<tr>
+      <td style="font-weight:bold;font-size:12px;white-space:nowrap;max-width:190px;overflow:hidden;text-overflow:ellipsis" title="${t.nome}">${t.nome.split('—')[0].trim()}</td>
+      <td style="font-size:11px;padding:6px 10px">${checks}</td>
+      <td class="td-net">${eI(c.rn)}</td>
+    </tr>`);
+  });
+}
+
+function cfToggleMese(id,m,checked){
+  if(!D.cf)D.cf=JSON.parse(JSON.stringify(CF_DEFAULT));
+  if(!D.cf.cedoleMesi)D.cf.cedoleMesi={};
+  const t=[...TITOLI,...(D.customTitoli||[])].find(t=>t.id===id);
+  let mesi=([...(D.cf.cedoleMesi[id]||(t?t.mesiCedola:[])||[])]);
+  if(checked&&!mesi.includes(m))mesi.push(m);
+  else if(!checked)mesi=mesi.filter(x=>x!==m);
+  mesi.sort((a,b)=>a-b);
+  D.cf.cedoleMesi[id]=mesi;
+  salva();rdCashFlow();
+}
+
+function salvaCF(){
+  if(!D.cf)D.cf={};
+  const g=id=>parseFloat(document.getElementById(id)?.value)||0;
+  const pm=id=>{
+    const v=(document.getElementById(id)?.value||'').trim();
+    if(!v)return[];
+    return v.split(',').map(s=>parseInt(s.trim(),10)).filter(n=>n>=1&&n<=12);
+  };
+  D.cf.inps=g('cf-inps');
+  D.cf.inpsExtra=pm('cf-inps-extra');
+  D.cf.pensioneFR=g('cf-fr');
+  D.cf.pensioneMamma=g('cf-mamma');
+  D.cf.unilever=g('cf-uni');
+  D.cf.unilevermese=parseInt(document.getElementById('cf-uni-mese')?.value)||5;
+  D.cf.speseVita=g('cf-spvita');
+  D.cf.speseVitaDouble=pm('cf-spvita-double');
+  salva();rdCashFlow();
+}
+
+function rdAll(){rdManuali();rdTitoli();rdRiep();rdApt();rdComp();rdCashFlow()}
 
 function salvaCalc(){
   D.saldoCC=parseFloat(document.getElementById('saldoCC').value)||0;
   D.saldoISP=parseFloat(document.getElementById('saldoISP').value)||0;
   salva();
   rdManuali();
-  rdTitoli();rdRiep();rdComp();
+  rdTitoli();rdRiep();rdComp();rdCashFlow();
 }
 
 function aggiornaVm(id,val){
   D.valMkt[id]=parseFloat(val)||0;
   salva();
-  rdTitoli();rdRiep();rdComp();
+  rdTitoli();rdRiep();rdComp();rdCashFlow();
 }
 
-function addSpesa(ai){D.apt[ai].spese.push({et:'',vo:'',l:0,n:0,no:''});salva();rdApt();rdManuali();rdRiep();rdComp()}
-function delSpesa(ai,si){D.apt[ai].spese.splice(si,1);salva();rdApt();rdManuali();rdRiep();rdComp()}
+function addSpesa(ai){D.apt[ai].spese.push({et:'',vo:'',l:0,n:0,no:''});salva();rdApt();rdManuali();rdRiep();rdComp();rdCashFlow()}
+function delSpesa(ai,si){D.apt[ai].spese.splice(si,1);salva();rdApt();rdManuali();rdRiep();rdComp();rdCashFlow()}
 
 /* ── SIMULAZIONE ── */
 function simVendi(id){
