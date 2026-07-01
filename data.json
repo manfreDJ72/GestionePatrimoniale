@@ -203,7 +203,7 @@
     "inps": 9600,
     "inpsExtra": [],
     "pensioneFR": 290,
-    "pensioneMamma": 600,
+    "pensioneMamma": 527,
     "unilever": 10500,
     "unilevermese": 5,
     "speseVita": 65000,
@@ -213,5 +213,5 @@
     ],
     "cedoleMesi": {}
   },
-  "_saved": 1782922763957
+  "_saved": 1782922770413
 }
