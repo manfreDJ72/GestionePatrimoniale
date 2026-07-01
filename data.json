@@ -202,7 +202,7 @@
   "cf": {
     "inps": 9600,
     "inpsExtra": [],
-    "pensioneFR": 250,
+    "pensioneFR": 290,
     "pensioneMamma": 600,
     "unilever": 10500,
     "unilevermese": 5,
@@ -213,5 +213,5 @@
     ],
     "cedoleMesi": {}
   },
-  "_saved": 1782922749645
+  "_saved": 1782922763957
 }
