@@ -359,7 +359,7 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
       <div class="inp-item">
         <label>Pensione INPS — importo per rata (&euro;)</label>
         <input type="number" id="cf-inps" step="50" min="0" class="inp-m" oninput="salvaCF()">
-        <span class="nota">Mesi con extrarata (es. <em>1,12</em>):&nbsp;<input type="text" id="cf-inps-extra" placeholder="1,12" oninput="salvaCF()" style="width:72px;font-size:13px;padding:3px 7px;min-height:unset;display:inline-block;vertical-align:middle"></span>
+        <span class="nota">Mesi con extrarata (es. <em>12</em>):&nbsp;<input type="text" id="cf-inps-extra" placeholder="12" oninput="salvaCF()" style="width:72px;font-size:13px;padding:3px 7px;min-height:unset;display:inline-block;vertical-align:middle"></span>
       </div>
       <div class="inp-item">
         <label>Pensione Francia (&euro;/mese)</label>
@@ -367,12 +367,13 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
         <span class="nota">Totale annuo &#8776; 3.000 &euro;</span>
       </div>
       <div class="inp-item">
-        <label>Pensione reversibilit&agrave; (&euro;/mese)</label>
+        <label>Pensione Anna Ghigliotti (&euro;/mese)</label>
         <input type="number" id="cf-mamma" step="50" min="0" class="inp-m" oninput="salvaCF()">
       </div>
       <div class="inp-item">
-        <label>Indennizzo Unilever (&euro;/anno) &mdash; mese:&nbsp;<input type="number" id="cf-uni-mese" min="1" max="12" step="1" oninput="salvaCF()" style="width:52px;font-size:14px;padding:3px 6px;min-height:unset;display:inline-block;vertical-align:middle"></label>
+        <label>Indennizzo Unilever (&euro;/anno)</label>
         <input type="number" id="cf-uni" step="500" min="0" class="inp-m" oninput="salvaCF()">
+        <span class="nota">Mese di accredito:&nbsp;<input type="number" id="cf-uni-mese" min="1" max="12" step="1" oninput="salvaCF()" style="width:52px;font-size:13px;padding:3px 7px;min-height:unset;display:inline-block;vertical-align:middle"></span>
       </div>
     </div>
     <!-- Spese vita + sommari -->
@@ -398,7 +399,7 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
         <thead><tr>
           <th style="text-align:left;min-width:90px">Mese</th>
           <th style="min-width:105px">INPS</th>
-          <th style="min-width:95px">Fr. / Rev.</th>
+          <th style="min-width:95px">Fr. / A.G.</th>
           <th style="min-width:90px">Unilever</th>
           <th style="min-width:100px">Cedole</th>
           <th style="min-width:110px;background:#155724">&#9654; ENTRATE</th>
@@ -504,9 +505,9 @@ const APT_DEFAULT=[
 
 const CF_DEFAULT={
   inps:9750,          // importo per rata INPS
-  inpsExtra:[1,12],   // mesi con extrarata (tredicesima/quattordicesima)
+  inpsExtra:[12],     // mesi con extrarata (tredicesima = solo dicembre)
   pensioneFR:250,     // pensione Francia €/mese (3.000€/anno ÷ 12)
-  pensioneMamma:600,  // pensione reversibilità €/mese
+  pensioneMamma:600,  // pensione Anna Ghigliotti €/mese
   unilever:10500,     // indennizzo Unilever €/anno
   unilevermese:5,     // mese di accredito Unilever (5 = maggio)
   speseVita:65000,    // spese di vita annue €
