@@ -1,5 +1,5 @@
 {
-  "saldoCC": 112899.25,
+  "saldoCC": 112866.25,
   "saldoISP": 20000.91,
   "certificate": 50000,
   "baseSpese": 32000,
@@ -213,5 +213,5 @@
     ],
     "cedoleMesi": {}
   },
-  "_saved": 1783064986413
+  "_saved": 1783064991674
 }
