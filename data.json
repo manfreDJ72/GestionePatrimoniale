@@ -5,7 +5,7 @@
   "baseSpese": 32000,
   "inflazione": 1.2,
   "inflazione_periodo": "2025-12",
-  "inflazione_ts": "2026-07-15T07:41:43.136Z",
+  "inflazione_ts": "2026-07-15T07:44:50.922Z",
   "prezzi": {},
   "valMkt": {},
   "prezziPrec": {
@@ -22,7 +22,7 @@
     "t9": 100000,
     "t10": 50000
   },
-  "tsAggiornamento": "15/07/2026, 09:41",
+  "tsAggiornamento": "15/07/2026, 09:44",
   "customTitoli": [],
   "esclusi": {},
   "apt": [
@@ -213,5 +213,5 @@
     ],
     "cedoleMesi": {}
   },
-  "_saved": 1784101317472
+  "_saved": 1784101495898
 }
