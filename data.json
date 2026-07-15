@@ -1,28 +1,28 @@
 {
-  "saldoCC": 109608.25,
-  "saldoISP": 20000.91,
-  "certificate": 50000,
+  "saldoCC": 0,
+  "saldoISP": 0,
+  "certificate": 0,
   "baseSpese": 32000,
   "inflazione": 1.2,
   "inflazione_periodo": "2025-12",
-  "inflazione_ts": "2026-07-15T07:44:50.922Z",
+  "inflazione_ts": "2026-06-22T11:59:28.175Z",
   "prezzi": {},
   "valMkt": {},
   "prezziPrec": {
     "t1": 94.11,
-    "t2": 101.66,
-    "t3": 102.59,
-    "t4": 101.19
+    "t2": 101.77,
+    "t3": 102.32,
+    "t4": 101.17
   },
   "valMktPrec": {
-    "t5": 200316.15,
-    "t6": 168622.58,
-    "t7": 220091.54,
+    "t5": 199827.65,
+    "t6": 170000,
+    "t7": 230000,
     "t8": 50000,
     "t9": 100000,
-    "t10": 50000
+    "t10": 40000
   },
-  "tsAggiornamento": "15/07/2026, 09:44",
+  "tsAggiornamento": "22/06/2026, 13:59",
   "customTitoli": [],
   "esclusi": {},
   "apt": [
@@ -200,11 +200,13 @@
     }
   ],
   "cf": {
-    "inps": 9600,
-    "inpsExtra": [],
-    "pensioneFR": 290,
-    "pensioneMamma": 527,
-    "unilever": 10600,
+    "inps": 9750,
+    "inpsExtra": [
+      12
+    ],
+    "pensioneFR": 250,
+    "pensioneMamma": 600,
+    "unilever": 10500,
     "unilevermese": 5,
     "speseVita": 65000,
     "speseVitaDouble": [
@@ -213,5 +215,5 @@
     ],
     "cedoleMesi": {}
   },
-  "_saved": 1784101576171
+  "_saved": 1784111105895
 }
