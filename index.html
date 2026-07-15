@@ -481,20 +481,21 @@ const TITOLI=[
    cedola:0.04,aliq:0.26,mesiCedola:[3,6,9,12],
    vmDef:220091.54,vmCarico:149977.47,
    link:'https://fundinfo.com/fund/lu1549373071'},
-  // ── Certificate ──
-  {id:'t8',cat:'Certificate',nome:'BPER Protection Memory Coupon',
+  // ── Certificate ── (ISIN confermato; cedola 2,25% semestrale = 4,5% annuo)
+  {id:'t8',cat:'Certificate',nome:'BPE EP CP Euro Stoxx Banks & Insu 260631',
    isin:'IT0005709875',ticker:null,tipo:'fondo',
-   cedola:0.045,aliq:0,vmDef:50000,mesiCedola:[3,6,9,12],link:null},
+   cedola:0.045,aliq:0,vmDef:50000,mesiCedola:[6,12],
+   link:'https://live.euronext.com/it/product/structured-products/IT0005709875-ETLX'},
   // ── Conto Deposito ──
   {id:'t9',cat:'Conto Deposito',nome:'Conto Deposito Vincolato BPER',
    isin:'',ticker:null,tipo:'fondo',
    cedola:0.033,aliq:0.26,vmDef:100000,mesiCedola:[12],link:null},
-  // ── Arca Bond Target 2031 ── (Deposito 6344735, 5.000 quote, utente conferma 50.000€)
-  {id:'t10',cat:'Fondo',nome:'Arca Bond Target 2031 — Reddito Dis.',
-   isin:'',ticker:null,tipo:'fondo',
+  // ── Arca Bond Tgt31r Dis ── (ISIN confermato; valore confermato utente 50.000€)
+  {id:'t10',cat:'Fondo',nome:'Arca Bond Tgt31r Dis',
+   isin:'IT0005694960',ticker:null,tipo:'fondo',
    cedola:0.04,aliq:0,mesiCedola:[3,9],
    vmDef:50000,vmCarico:50000,
-   link:'https://www.arcafondi.it/en/funds/arca-bond-target-2031'},
+   link:'https://www.borsaitaliana.it/borsa/fondi/dettaglio/1FADB1181486.html?lang=it'},
 ];
 
 const APT_DEFAULT=[
