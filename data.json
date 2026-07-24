@@ -1,5 +1,5 @@
 {
-  "saldoCC": 10625,
+  "saldoCC": 106655,
   "saldoISP": 20000.91,
   "certificate": 50000,
   "baseSpese": 32000,
@@ -22,7 +22,7 @@
     "t9": 100000,
     "t10": 50000
   },
-  "tsAggiornamento": "15/07/2026, 18:14",
+  "tsAggiornamento": "24/07/2026, 10:48",
   "customTitoli": [],
   "esclusi": {},
   "apt": [
@@ -213,5 +213,5 @@
     ],
     "cedoleMesi": {}
   },
-  "_saved": 1784882889616
+  "_saved": 1784882907425
 }
