@@ -1,11 +1,11 @@
 {
-  "saldoCC": 114340.88,
+  "saldoCC": 124563.88,
   "saldoISP": 20000.91,
   "certificate": 50000,
   "baseSpese": 32000,
   "inflazione": 1.2,
   "inflazione_periodo": "2025-12",
-  "inflazione_ts": "2026-09-01T16:59:42.640Z",
+  "inflazione_ts": "2026-08-14T13:10:02.867Z",
   "prezzi": {},
   "valMkt": {},
   "prezziPrec": {
@@ -22,7 +22,7 @@
     "t9": 100000,
     "t10": 50000
   },
-  "tsAggiornamento": "01/09/2026, 18:59",
+  "tsAggiornamento": "14/08/2026, 15:10",
   "customTitoli": [],
   "esclusi": {},
   "apt": [
@@ -211,14 +211,7 @@
       8,
       12
     ],
-    "cedoleMesi": {
-      "t3": [
-        3,
-        6,
-        9,
-        12
-      ]
-    }
+    "cedoleMesi": {}
   },
-  "_saved": 1788281987557
+  "_saved": 1788282007583
 }
