@@ -1189,7 +1189,11 @@ async function aggiornaTutto(){
 
 (async function init(){
   // 1. Carica subito da localStorage (istantaneo)
-  const hasLocalData=carica();rdAll();
+  const hasLocalData=carica();
+  // Pulizia valMktPrec errati: rimuovi chiavi non-BTP (bug storico)
+  const btpIds=new Set(TITOLI.filter(t=>t.tipo==='btp').map(t=>t.id));
+  Object.keys(D.valMktPrec||{}).forEach(k=>{if(!btpIds.has(k))delete D.valMktPrec[k]});
+  rdAll();
   // 2. Confronta con GitHub — usa la versione più recente
   // Se non c'è localStorage (primo accesso da nuovo dispositivo) → usa sempre GitHub
   // Se c'è localStorage → confronta timestamp, vince il più recente
