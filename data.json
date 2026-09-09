@@ -24,7 +24,7 @@
     "t9": 100000,
     "t10": 50000
   },
-  "tsAggiornamento": "02/09/2026, 18:00",
+  "tsAggiornamento": "09/09/2026, 17:40",
   "customTitoli": [],
   "esclusi": {},
   "apt": [
@@ -215,5 +215,5 @@
     ],
     "cedoleMesi": {}
   },
-  "_saved": 1788968433462
+  "_saved": 1788968437169
 }
