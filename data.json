@@ -5,9 +5,11 @@
   "baseSpese": 32000,
   "inflazione": 1.2,
   "inflazione_periodo": "2025-12",
-  "inflazione_ts": "2026-09-02T16:00:20.684Z",
+  "inflazione_ts": "2026-09-09T15:40:13.161Z",
   "prezzi": {},
-  "valMkt": {},
+  "valMkt": {
+    "t9": 100000
+  },
   "prezziPrec": {
     "t1": 94.11,
     "t2": 101.66,
@@ -213,5 +215,5 @@
     ],
     "cedoleMesi": {}
   },
-  "_saved": 1788939933729
+  "_saved": 1788968433462
 }
