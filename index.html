@@ -792,11 +792,13 @@ function rdTitoli(){
       </div>`;
     }else{
       const vm=getVm(t),investito=t.vmCarico!==undefined?t.vmCarico:(t.vmDef||0),pls=plusStr(vm,investito);
+      const dVM=deltaStr(vm,D.valMktPrec[t.id]);
       boxH=`<div class="prez-box" style="min-width:195px">
         <div class="prez-etichetta">Fondo &mdash; carico / mercato</div>
         ${rowH('Investito (carico)',eI(investito),true)}
         ${rowH('Oggi',eI(vm),false)}
         <div class="prez-delta ${pls.cls}" style="margin-top:3px">${pls.txt}</div>
+        ${D.valMktPrec[t.id]?`<div style="font-size:11px;color:#888;margin-top:2px;text-align:right">Da ieri: ${dVM.txt}</div>`:''}
       </div>`;
     }
     const linkH=t.link?`<a href="${t.link}" target="_blank" style="font-size:19px;text-decoration:none;vertical-align:middle" title="Scheda fondo/titolo">🔗</a>`:'';
@@ -1104,7 +1106,9 @@ function salvaCalc(){
 }
 
 function aggiornaVm(id,val){
-  D.valMkt[id]=parseFloat(val)||0;
+  const newVal=parseFloat(val)||0;
+  if(D.valMkt[id]!==undefined&&D.valMkt[id]!==newVal)D.valMktPrec[id]=D.valMkt[id];
+  D.valMkt[id]=newVal;
   salva();
   rdTitoli();rdRiep();rdComp();rdCashFlow();
 }
@@ -1168,7 +1172,7 @@ async function aggiornaTutto(){
     D.inflazione=valore;D.inflazione_periodo=periodo;D.inflazione_ts=new Date().toISOString();
     msgs.push(`✅ Inflazione ${eP(valore,1)} (${periodoLeggibile(periodo)})`);
   }catch(e){msgs.push('⚠️ Inflazione BCE non raggiungibile')}
-  TITOLI.forEach(t=>{if(t.tipo==='btp')D.prezziPrec[t.id]=getPrez(t);else D.valMktPrec[t.id]=getVm(t)});
+  TITOLI.forEach(t=>{if(t.tipo==='btp')D.prezziPrec[t.id]=getPrez(t)});
   let ok=0,fail=0,fn=[];
   for(const t of TITOLI){
     if(!t.ticker)continue;
