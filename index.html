@@ -453,48 +453,48 @@ const TITOLI=[
   {id:'t2',cat:'Titoli di Stato',nome:'BTP 7,25% — scad. 11/2026',
    isin:'IT0001086567',ticker:'IT0001086567.MI',tipo:'btp',
    nominale:59316.48,cedola:0.0725,aliq:0.125,
-   prezDef:101.66,prezAcquisto:126.59,mesiCedola:[5,11],
+   prezDef:101.66,prezAcquisto:126.59,mesiCedola:[5,11],dataCarico:null,
    link:'https://www.borsaitaliana.it/borsa/titoli-di-stato/btp/scheda/IT0001086567.html'},
   {id:'t3',cat:'Titoli di Stato',nome:'BTP Valore 3,25%→4% — scad. 03/2030',
    isin:'IT0005583486',ticker:'IT0005583486.MI',tipo:'btp',
    nominale:50000,cedola:0.0325,aliq:0.125,
-   prezDef:102.59,prezAcquisto:100,mesiCedola:[3,6,9,12],
+   prezDef:102.59,prezAcquisto:100,mesiCedola:[3,6,9,12],dataCarico:'11/2023',
    link:'https://www.borsaitaliana.it/borsa/titoli-di-stato/btp/scheda/IT0005583486.html'},
   {id:'t4',cat:'Titoli di Stato',nome:'BTP Valore 4% — scad. 06/2027',
    isin:'IT0005547408',ticker:'IT0005547408.MI',tipo:'btp',
    nominale:150000,cedola:0.04,aliq:0.125,
-   prezDef:101.19,prezAcquisto:100,mesiCedola:[3,6,9,12],
+   prezDef:101.19,prezAcquisto:100,mesiCedola:[3,6,9,12],dataCarico:'06/2023',
    link:'https://www.borsaitaliana.it/borsa/titoli-di-stato/btp/scheda/IT0005547408.html'},
   // ── Fondi JPMorgan ── (quote/prezzi/carico da PDF del 25/06/2026)
   {id:'t5',cat:'Fondo',nome:'JPM Flexible Credit D EUR',
    isin:'LU0562087980',ticker:null,tipo:'fondo',
    cedola:0.0594,aliq:0.26,mesiCedola:[1,2,3,4,5,6,7,8,9,10,11,12],
-   vmDef:200316.15,vmCarico:199805.16,
+   vmDef:200316.15,vmCarico:199805.16,dataCarico:'06/2026',
    link:'https://fundinfo.com/fund/lu0562087980'},
   {id:'t6',cat:'Fondo',nome:'JPM Global Income D EUR',
    isin:'LU0404220724',ticker:null,tipo:'fondo',
    cedola:0.0519,aliq:0.26,mesiCedola:[3,6,9,12],
-   vmDef:168622.58,vmCarico:170000,
+   vmDef:168622.58,vmCarico:170000,dataCarico:'06/2026',
    link:'https://fundinfo.com/fund/lu0404220724'},
   {id:'t7',cat:'Fondo',nome:'JPM Europe High Yield Bond D EUR',
    isin:'LU1549373071',ticker:null,tipo:'fondo',
    cedola:0.04,aliq:0.26,mesiCedola:[3,6,9,12],
-   vmDef:220091.54,vmCarico:220000,
+   vmDef:220091.54,vmCarico:220000,dataCarico:'06/2026',
    link:'https://fundinfo.com/fund/lu1549373071'},
   // ── Certificate ── (ISIN confermato; cedola 2,25% semestrale = 4,5% annuo)
   {id:'t8',cat:'Certificate',nome:'BPE EP CP Euro Stoxx Banks & Insu 260631',
    isin:'IT0005709875',ticker:null,tipo:'fondo',
-   cedola:0.045,aliq:0,vmDef:50000,mesiCedola:[6,12],
+   cedola:0.045,aliq:0,vmDef:50000,mesiCedola:[6,12],dataCarico:'06/2026',
    link:'https://live.euronext.com/it/product/structured-products/IT0005709875-ETLX'},
   // ── Conto Deposito ──
   {id:'t9',cat:'Conto Deposito',nome:'Conto Deposito Vincolato BPER',
    isin:'',ticker:null,tipo:'fondo',
-   cedola:0.033,aliq:0.26,vmDef:100000,mesiCedola:[12],link:null},
+   cedola:0.033,aliq:0.26,vmDef:100000,mesiCedola:[12],dataCarico:'06/2026',link:null},
   // ── Arca Bond Tgt31r Dis ── (ISIN confermato; valore confermato utente 50.000€)
   {id:'t10',cat:'Fondo',nome:'Arca Bond Tgt31r Dis',
    isin:'IT0005694960',ticker:null,tipo:'fondo',
    cedola:0.04,aliq:0,mesiCedola:[3,9],
-   vmDef:50000,vmCarico:50000,
+   vmDef:50000,vmCarico:50000,dataCarico:'06/2025',
    link:'https://www.borsaitaliana.it/borsa/fondi/dettaglio/1FADB1181486.html?lang=it'},
 ];
 
@@ -770,12 +770,14 @@ function rdTitoli(){
     const rowH=(lbl,val,small)=>`<div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:3px">
       <span style="font-size:11px;color:#5a8fc4">${lbl}</span>
       <span style="${small?'font-size:13px;color:#555':'font-size:17px;font-weight:bold;color:var(--blu-md)'}">${val}</span></div>`;
+    const dataH=t.dataCarico?`<div style="font-size:11px;color:#888;margin-top:2px;text-align:right">Acquisto: ${esc(t.dataCarico)}</div>`:'';
     if(t.tipo==='btp'){
       const prez=getPrez(t),investito=t.nominale*(t.prezAcquisto||100)/100;
       const pls=plusStr(c.vm,investito);
       const dP=deltaStr(prez,D.prezziPrec[t.id]);
       boxH=`<div class="prez-box" style="min-width:195px">
         <div class="prez-etichetta">BTP &mdash; prezzi automatici &#128260;</div>
+        ${dataH}
         ${rowH('Investito',eI(investito),true)}
         ${rowH('Oggi',eI(c.vm),false)}
         <div class="prez-delta ${pls.cls}" style="margin-top:3px">${pls.txt}</div>
@@ -785,6 +787,7 @@ function rdTitoli(){
       const vm=getVm(t),investito=t.vmCarico!==undefined?t.vmCarico:(t.vmDef||0),pls=plusStr(vm,investito);
       boxH=`<div class="fondo-box" style="min-width:195px">
         <div class="fondo-etichetta">Conto Deposito &#9998; aggiorna</div>
+        ${dataH}
         ${rowH('Investito',eI(investito),true).replace('#5a8fc4','#7B6A00').replace('#555','#7B3F00')}
         <input class="fondo-inp" type="number" step="100" min="0" value="${vm.toFixed(0)}"
           onblur="aggiornaVm('${t.id}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" style="text-align:right;margin-top:3px">
@@ -795,6 +798,7 @@ function rdTitoli(){
       const dVM=deltaStr(vm,D.valMktPrec[t.id]);
       boxH=`<div class="prez-box" style="min-width:195px">
         <div class="prez-etichetta">Fondo &mdash; carico / mercato</div>
+        ${dataH}
         ${rowH('Investito (carico)',eI(investito),true)}
         ${rowH('Oggi',eI(vm),false)}
         <div class="prez-delta ${pls.cls}" style="margin-top:3px">${pls.txt}</div>
