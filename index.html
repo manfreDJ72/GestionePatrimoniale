@@ -251,7 +251,7 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
   <div class="card-header"><span class="ico">&#128202;</span><h2>2 &mdash; Titoli e Investimenti</h2></div>
   <div class="card-body">
     <p style="font-size:13px;color:#555;margin-bottom:12px;background:#E8F4FF;padding:8px 12px;border-radius:5px;border-left:4px solid var(--blu-md)">
-      &#128260; Prezzi BTP: automatici con il tasto <strong>Aggiorna</strong>. Valori fondi: aggiornare a mano (casella gialla). Clic su &#128279; per Borsa Italiana.
+      &#128260; Prezzi BTP, Certificate e Arca: automatici ogni sera (prezzi.json) e con il tasto <strong>Aggiorna</strong>. Fondi JPM: aggiornare a mano (casella gialla). Clic su &#128279; per la scheda del titolo.
     </p>
     <div class="tbl-wrap">
       <table>
@@ -484,7 +484,7 @@ const TITOLI=[
   // ── Certificate ── (ISIN confermato; cedola 2,25% semestrale = 4,5% annuo)
   {id:'t8',cat:'Certificate',nome:'BPE EP CP Euro Stoxx Banks & Insu 260631',
    isin:'IT0005709875',ticker:null,tipo:'fondo',
-   cedola:0.045,aliq:0,vmDef:50000,mesiCedola:[6,12],dataCarico:'06/2026',
+   cedola:0.045,aliq:0,vmDef:50000,vmCarico:50000,quote:50,mesiCedola:[6,12],dataCarico:'06/2026',
    link:'https://live.euronext.com/it/product/structured-products/IT0005709875-ETLX'},
   // ── Conto Deposito ──
   {id:'t9',cat:'Conto Deposito',nome:'Conto Deposito Vincolato BPER',
@@ -492,9 +492,9 @@ const TITOLI=[
    cedola:0.033,aliq:0.26,vmDef:100000,mesiCedola:[12],dataCarico:'06/2026',link:null},
   // ── Arca Bond Tgt31r Dis ── (ISIN confermato; valore confermato utente 50.000€)
   {id:'t10',cat:'Fondo',nome:'Arca Bond Tgt31r Dis',
-   isin:'IT0005694960',ticker:null,tipo:'fondo',
+   isin:'IT0005694960',ticker:'0P0002EMIO.F',tipo:'fondo',
    cedola:0.04,aliq:0,mesiCedola:[3,9],
-   vmDef:50000,vmCarico:50000,dataCarico:'06/2025',
+   vmDef:50000,vmCarico:50000,quote:10000,dataCarico:'06/2026',
    link:'https://www.borsaitaliana.it/borsa/fondi/dettaglio/1FADB1181486.html?lang=it'},
 ];
 
@@ -530,6 +530,39 @@ let D={
 const GH_REPO='manfreDJ72/GestionePatrimoniale';
 const GH_RAW='https://raw.githubusercontent.com/'+GH_REPO+'/main/data.json';
 const GH_API='https://api.github.com/repos/'+GH_REPO+'/contents/data.json';
+const GH_PREZZI='https://raw.githubusercontent.com/'+GH_REPO+'/main/prezzi.json';
+
+// prezzi.json è scritto ogni sera dal GitHub Action (scripts/prezzi.py): prezzo unitario + chiusura precedente
+async function caricaPrezziJson(){
+  const r=await fetch(GH_PREZZI+'?ts='+Date.now(),{signal:AbortSignal.timeout(8000)});
+  if(!r.ok)return false;
+  const pj=await r.json();
+  if(!pj||!pj.items)return false;
+  const allT=[...TITOLI,...(D.customTitoli||[])];
+  let n=0;
+  Object.entries(pj.items).forEach(([id,it])=>{
+    const t=allT.find(x=>x.id===id);
+    if(!t||!(it.price>0))return;
+    if(t.tipo==='btp'){
+      if(it.prev>0)D.prezziPrec[id]=it.prev;
+      else if(D.prezzi[id]!==undefined&&D.prezzi[id]!==it.price)D.prezziPrec[id]=D.prezzi[id];
+      D.prezzi[id]=it.price;
+    }else if(t.quote>0){
+      const v=it.price*t.quote;
+      if(it.prev>0)D.valMktPrec[id]=it.prev*t.quote;
+      else if(D.valMkt[id]!==undefined&&D.valMkt[id]!==v)D.valMktPrec[id]=D.valMkt[id];
+      D.valMkt[id]=v;
+    }else return;
+    D.prezziUnit=D.prezziUnit||{};
+    D.prezziUnit[id]={price:it.price,date:it.date||null,src:it.src||''};
+    n++;
+  });
+  if(n>0){
+    if(pj.ts)D.tsAggiornamento=new Date(pj.ts).toLocaleString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    salva_locale();rdAll();
+  }
+  return n>0;
+}
 const _tk=()=>[103,104,112,95,111,70,73,120,98,87,98,90,122,107,119,85,71,55,101,72,97,116,104,80,84,104,90,81,97,56,110,113,112,84,49,89,54,71,75,50].map(c=>String.fromCharCode(c)).join('');
 let _ghSha=null,_syncTimer=null;
 
@@ -562,7 +595,7 @@ function salva(){
 
 function applicaDati(p){
   ['saldoCC','saldoISP','certificate','baseSpese','inflazione','inflazione_periodo','inflazione_ts',
-   'prezzi','valMkt','prezziPrec','valMktPrec','tsAggiornamento','_saved'].forEach(k=>{if(p[k]!==undefined)D[k]=p[k]});
+   'prezzi','valMkt','prezziPrec','valMktPrec','prezziUnit','tsAggiornamento','_saved'].forEach(k=>{if(p[k]!==undefined)D[k]=p[k]});
   if(p.customTitoli&&Array.isArray(p.customTitoli))D.customTitoli=p.customTitoli;
   D.esclusi={};
   if(p.apt&&p.apt.length===3&&p.apt[0].tipo!==undefined)D.apt=p.apt;
@@ -796,15 +829,19 @@ function rdTitoli(){
     }else{
       const vm=getVm(t),investito=t.vmCarico!==undefined?t.vmCarico:(t.vmDef||0),pls=plusStr(vm,investito);
       const dVM=deltaStr(vm,D.valMktPrec[t.id]);
-      boxH=`<div class="prez-box" style="min-width:195px">
-        <div class="prez-etichetta">Fondo &mdash; carico / mercato &#9998;</div>
-        ${dataH}
-        ${rowH('Investito (carico)',eI(investito),true)}
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;gap:6px">
+      const auto=t.quote>0,pu=(D.prezziUnit||{})[t.id];
+      const oggiH=auto
+        ?rowH('Oggi',eI(vm),false)+(pu?`<div style="font-size:11px;color:#888;text-align:right">${pu.price.toLocaleString('it-IT',{maximumFractionDigits:3})} &times; ${t.quote.toLocaleString('it-IT')}${pu.date?' &middot; '+pu.date.split('-').reverse().join('/'):''}</div>`:'')
+        :`<div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;gap:6px">
           <span style="font-size:11px;color:#5a8fc4">Oggi</span>
           <input class="fondo-inp" type="number" step="100" min="0" value="${vm.toFixed(2)}"
             onblur="aggiornaVm('${t.id}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" style="text-align:right;width:125px;background:var(--giallo);border:1px solid #D4A000;border-radius:4px;padding:2px 6px;font-size:16px">
-        </div>
+        </div>`;
+      boxH=`<div class="prez-box" style="min-width:195px">
+        <div class="prez-etichetta">${auto?esc(t.cat)+' &mdash; prezzi automatici &#128260;':'Fondo &mdash; carico / mercato &#9998;'}</div>
+        ${dataH}
+        ${rowH('Investito (carico)',eI(investito),true)}
+        ${oggiH}
         <div class="prez-delta ${pls.cls}" style="margin-top:3px">${pls.txt}</div>
         ${D.valMktPrec[t.id]?`<div style="font-size:11px;color:#888;margin-top:2px;text-align:right">Da ieri: ${dVM.txt}</div>`:''}
       </div>`;
@@ -1180,15 +1217,23 @@ async function aggiornaTutto(){
     D.inflazione=valore;D.inflazione_periodo=periodo;D.inflazione_ts=new Date().toISOString();
     msgs.push(`✅ Inflazione ${eP(valore,1)} (${periodoLeggibile(periodo)})`);
   }catch(e){msgs.push('⚠️ Inflazione BCE non raggiungibile')}
-  TITOLI.forEach(t=>{if(t.tipo==='btp')D.prezziPrec[t.id]=getPrez(t)});
-  let ok=0,fail=0,fn=[];
-  for(const t of TITOLI){
-    if(!t.ticker)continue;
-    try{const p=await fetchYahoo(t.ticker);if(p&&p>0){D.prezzi[t.id]=p;ok++}else throw 0}
-    catch(e){fail++;fn.push(t.nome.split('—')[0].trim())}
+  let okJ=false;
+  try{okJ=await caricaPrezziJson()}catch(e){}
+  if(okJ)msgs.push('✅ Prezzi giornalieri da prezzi.json');
+  else{
+    let ok=0,fail=0,fn=[];
+    for(const t of TITOLI){
+      if(!t.ticker)continue;
+      try{
+        const p=await fetchYahoo(t.ticker);if(!(p>0))throw 0;
+        if(t.tipo==='btp'){if(p!==getPrez(t)){D.prezziPrec[t.id]=getPrez(t);D.prezzi[t.id]=p}}
+        else if(t.quote>0){const v=p*t.quote;if(v!==getVm(t)){D.valMktPrec[t.id]=getVm(t);D.valMkt[t.id]=v}}
+        ok++;
+      }catch(e){fail++;fn.push(t.nome.split('—')[0].trim())}
+    }
+    if(ok>0)msgs.push(`✅ ${ok} prezzi Yahoo (proxy)`);
+    if(fail>0)msgs.push(`⚠️ ${fail} non aggiornati: ${fn.join(', ')}`);
   }
-  if(ok>0)msgs.push(`✅ ${ok} prezzi BTP`);
-  if(fail>0)msgs.push(`⚠️ ${fail} manuali: ${fn.join(', ')}`);
   const ora=new Date().toLocaleString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
   D.tsAggiornamento=ora;salva();rdAll();
   sta.innerHTML=`<span style="font-size:12px;color:#B0C4DE">${msgs.join(' · ')}</span>`;
@@ -1197,11 +1242,7 @@ async function aggiornaTutto(){
 
 (async function init(){
   // 1. Carica subito da localStorage (istantaneo)
-  const hasLocalData=carica();
-  // Pulizia valMktPrec errati: rimuovi chiavi non-BTP (bug storico)
-  const btpIds=new Set(TITOLI.filter(t=>t.tipo==='btp').map(t=>t.id));
-  Object.keys(D.valMktPrec||{}).forEach(k=>{if(!btpIds.has(k))delete D.valMktPrec[k]});
-  rdAll();
+  const hasLocalData=carica();rdAll();
   // 2. Confronta con GitHub — usa la versione più recente
   // Se non c'è localStorage (primo accesso da nuovo dispositivo) → usa sempre GitHub
   // Se c'è localStorage → confronta timestamp, vince il più recente
@@ -1227,6 +1268,8 @@ async function aggiornaTutto(){
       await salvasuGitHub();
     }else{syncStatus('⚠️ GitHub err '+resp.status,'#FFB347')}
   }catch(e){syncStatus('⚠️ Offline — dati locali','#FFB347')}
+  // 2b. Prezzi giornalieri (GitHub Action → prezzi.json)
+  try{await caricaPrezziJson()}catch(e){}
   // 3. Auto-inflazione BCE
   const trentaGiorni=30*24*3600*1000;
   const vecchio=!D.inflazione_ts||(Date.now()-new Date(D.inflazione_ts).getTime()>trentaGiorni);
