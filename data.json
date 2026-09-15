@@ -8,7 +8,8 @@
   "inflazione_ts": "2026-09-10T09:31:21.972Z",
   "prezzi": {},
   "valMkt": {
-    "t9": 100000
+    "t9": 100000,
+    "t8": 48000
   },
   "prezziPrec": {
     "t1": 94.11,
@@ -17,7 +18,7 @@
     "t4": 101.19
   },
   "valMktPrec": {},
-  "tsAggiornamento": "10/09/2026, 11:31",
+  "tsAggiornamento": "15/09/2026, 11:31",
   "customTitoli": [],
   "esclusi": {},
   "apt": [
@@ -207,6 +208,13 @@
       12
     ],
     "cedoleMesi": {}
+  },
+  "prezziUnit": {
+    "t8": {
+      "price": 960,
+      "date": "2026-09-15",
+      "src": "borsaitaliana"
+    }
   },
   "_saved": 1789032705981
 }
