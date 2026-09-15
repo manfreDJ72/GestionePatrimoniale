@@ -1,0 +1,17 @@
+{
+  "ts": "2026-09-15T09:31:34+00:00",
+  "items": {
+    "t8": {
+      "price": 960.0,
+      "prev": null,
+      "date": "2026-09-15",
+      "src": "borsaitaliana"
+    }
+  },
+  "errors": {
+    "t2": "HTTP Error 429: Too Many Requests",
+    "t3": "HTTP Error 429: Too Many Requests",
+    "t4": "HTTP Error 429: Too Many Requests",
+    "t10": "HTTP Error 429: Too Many Requests"
+  }
+}
