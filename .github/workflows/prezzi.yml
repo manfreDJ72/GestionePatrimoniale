@@ -1,0 +1,27 @@
+name: Aggiorna prezzi
+
+on:
+  schedule:
+    - cron: '45 17 * * 1-5'   # 17:45 UTC = 19:45 Roma, dopo la chiusura dei mercati
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  prezzi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Scarica prezzi
+        run: python scripts/prezzi.py
+      - name: Commit prezzi.json
+        run: |
+          git config user.name "prezzi-bot"
+          git config user.email "actions@github.com"
+          git add prezzi.json
+          git diff --cached --quiet || git commit -m "Prezzi $(date -u +%F)"
+          git push
