@@ -216,7 +216,6 @@
     ],
     "cedoleMesi": {}
   },
-  "_saved": 1789552862616,
   "prezziUnit": {
     "t2": {
       "price": 100.572,
@@ -243,5 +242,6 @@
       "date": "2026-09-11",
       "src": "borsaitaliana"
     }
-  }
+  },
+  "_saved": 1789552862616
 }
