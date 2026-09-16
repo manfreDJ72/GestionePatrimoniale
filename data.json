@@ -203,7 +203,7 @@
     }
   ],
   "cf": {
-    "inps": 9600,
+    "inps": 9650,
     "inpsExtra": [],
     "pensioneFR": 290,
     "pensioneMamma": 527,
@@ -216,7 +216,7 @@
     ],
     "cedoleMesi": {}
   },
-  "_saved": 1789552771614,
+  "_saved": 1789552862616,
   "prezziUnit": {
     "t2": {
       "price": 100.572,
