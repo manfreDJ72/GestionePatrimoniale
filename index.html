@@ -439,11 +439,16 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
           </tr></thead>
           <tbody id="cf-cedole-tbody"></tbody>
           <tfoot><tr class="tot-row">
-            <td style="text-align:left;vertical-align:top">TOTALE<br><span style="font-size:10px;font-weight:normal;color:#555">cedole per mese &rarr;</span></td>
-            <td id="cf-ced-t-mesi" style="padding:6px 10px"></td>
+            <td style="text-align:left">TOTALE</td>
+            <td id="cf-ced-t-mesi-lbl" style="padding:6px 10px;white-space:nowrap"></td>
             <td class="td-num" id="cf-ced-t-rn"></td>
             <td class="td-num" id="cf-ced-t-n"></td>
             <td class="td-num" id="cf-ced-t-media" title="Rendita totale ÷ numero totale di cedole"></td>
+          </tr>
+          <tr style="background:#fff">
+            <td style="text-align:left;font-size:11px;color:#555;font-weight:bold;white-space:nowrap">Cedole attese per mese</td>
+            <td id="cf-ced-t-mesi" style="padding:8px 10px;white-space:nowrap"></td>
+            <td colspan="3" style="font-size:11px;color:#777;text-align:left">somma dei 12 mesi = rendita netta annua</td>
           </tr></tfoot>
         </table>
       </div>
@@ -1109,9 +1114,9 @@ function rdCFCedoleDetail(){
     totRn+=c.rn;totN+=nCed;
     const checks=MESI_S.map((ms,i)=>{
       const m=i+1,ck=mesi.includes(m)?'checked':'';
-      return`<label style="cursor:pointer;display:inline-block;margin:0 4px 3px 0;white-space:nowrap">
-        <input type="checkbox" ${ck} onchange="cfToggleMese('${t.id}',${m},this.checked)" style="margin:0 2px 0 0;cursor:pointer">
-        <span style="font-size:11px">${ms}</span></label>`;
+      return`<label style="cursor:pointer;display:inline-block;width:58px;margin:0 0 3px 0;white-space:nowrap;text-align:center">
+        <input type="checkbox" ${ck} onchange="cfToggleMese('${t.id}',${m},this.checked)" style="margin:0 2px 0 0;cursor:pointer;vertical-align:middle">
+        <span style="font-size:11px;vertical-align:middle">${ms}</span></label>`;
     }).join('');
     tbody.insertAdjacentHTML('beforeend',`<tr>
       <td style="font-weight:bold;font-size:12px;white-space:nowrap;max-width:190px;overflow:hidden;text-overflow:ellipsis" title="${t.nome}">${t.nome.split('—')[0].trim()}</td>
@@ -1123,11 +1128,11 @@ function rdCFCedoleDetail(){
   });
   const st=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
   st('cf-ced-t-rn',eI(totRn));st('cf-ced-t-n',String(totN));st('cf-ced-t-media',totN>0?eI(totRn/totN):'—');
+  const el=document.getElementById('cf-ced-t-mesi-lbl');
+  if(el)el.innerHTML=MESI_S.map(ms=>`<span style="display:inline-block;width:58px;text-align:center;font-size:11px;color:#fff;font-weight:bold">${ms}</span>`).join('');
   const em=document.getElementById('cf-ced-t-mesi');
   if(em)em.innerHTML=MESI_S.map((ms,i)=>{const v=calcCFMese(i+1).cedole;
-    return`<span style="display:inline-block;min-width:54px;margin:0 4px 3px 0;text-align:center;vertical-align:top">
-      <span style="display:block;font-size:10px;color:#888;font-weight:normal">${ms}</span>
-      <span style="display:block;font-size:12px;${v>0?'color:var(--verde)':'color:#bbb'}">${v>0?eI(v):'—'}</span></span>`}).join('');
+    return`<span style="display:inline-block;width:58px;text-align:center;font-size:12px;font-weight:bold;${v>0?'color:#111':'color:#bbb'}">${v>0?eI(v):'—'}</span>`}).join('');
 }
 
 function cfToggleMese(id,m,checked){
