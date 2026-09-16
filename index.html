@@ -431,11 +431,11 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
       <div class="tbl-wrap">
         <table style="font-size:13px">
           <thead><tr>
-            <th style="text-align:left;min-width:180px">Strumento</th>
+            <th style="text-align:left;min-width:150px">Strumento</th>
             <th style="text-align:left">Mesi di pagamento</th>
-            <th style="min-width:120px">Rendita netta/anno</th>
-            <th style="min-width:70px">N. cedole</th>
-            <th style="min-width:120px">Cedola media netta</th>
+            <th style="min-width:100px">Rendita netta/anno</th>
+            <th style="min-width:55px">N. cedole</th>
+            <th style="min-width:100px">Cedola media netta</th>
           </tr></thead>
           <tbody id="cf-cedole-tbody"></tbody>
           <tfoot><tr class="tot-row">
@@ -1114,12 +1114,12 @@ function rdCFCedoleDetail(){
     totRn+=c.rn;totN+=nCed;
     const checks=MESI_S.map((ms,i)=>{
       const m=i+1,ck=mesi.includes(m)?'checked':'';
-      return`<label style="cursor:pointer;display:inline-block;width:58px;margin:0 0 3px 0;white-space:nowrap;text-align:center">
+      return`<label style="cursor:pointer;display:inline-block;width:50px;margin:0 0 3px 0;white-space:nowrap;text-align:center">
         <input type="checkbox" ${ck} onchange="cfToggleMese('${t.id}',${m},this.checked)" style="margin:0 2px 0 0;cursor:pointer;vertical-align:middle">
         <span style="font-size:11px;vertical-align:middle">${ms}</span></label>`;
     }).join('');
     tbody.insertAdjacentHTML('beforeend',`<tr>
-      <td style="font-weight:bold;font-size:12px;white-space:nowrap;max-width:190px;overflow:hidden;text-overflow:ellipsis" title="${t.nome}">${t.nome.split('—')[0].trim()}</td>
+      <td style="font-weight:bold;font-size:12px;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis" title="${t.nome}">${t.nome.split('—')[0].trim()}</td>
       <td style="font-size:11px;padding:6px 10px">${checks}</td>
       <td class="td-net">${eI(c.rn)}</td>
       <td class="td-num">${nCed}</td>
@@ -1129,10 +1129,10 @@ function rdCFCedoleDetail(){
   const st=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
   st('cf-ced-t-rn',eI(totRn));st('cf-ced-t-n',String(totN));st('cf-ced-t-media',totN>0?eI(totRn/totN):'—');
   const el=document.getElementById('cf-ced-t-mesi-lbl');
-  if(el)el.innerHTML=MESI_S.map(ms=>`<span style="display:inline-block;width:58px;text-align:center;font-size:11px;color:#fff;font-weight:bold">${ms}</span>`).join('');
+  if(el)el.innerHTML=MESI_S.map(ms=>`<span style="display:inline-block;width:50px;text-align:center;font-size:11px;color:#fff;font-weight:bold">${ms}</span>`).join('');
   const em=document.getElementById('cf-ced-t-mesi');
   if(em)em.innerHTML=MESI_S.map((ms,i)=>{const v=calcCFMese(i+1).cedole;
-    return`<span style="display:inline-block;width:58px;text-align:center;font-size:12px;font-weight:bold;${v>0?'color:#111':'color:#bbb'}">${v>0?eI(v):'—'}</span>`}).join('');
+    return`<span style="display:inline-block;width:50px;text-align:center;font-size:11px;font-weight:bold;${v>0?'color:#111':'color:#bbb'}">${v>0?eI(v):'—'}</span>`}).join('');
 }
 
 function cfToggleMese(id,m,checked){
