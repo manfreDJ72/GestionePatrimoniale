@@ -434,8 +434,17 @@ table.apt-tbl tr.tot-row td{background:#7B3F00}
             <th style="text-align:left;min-width:180px">Strumento</th>
             <th style="text-align:left">Mesi di pagamento</th>
             <th style="min-width:120px">Rendita netta/anno</th>
+            <th style="min-width:70px">N. cedole</th>
+            <th style="min-width:120px">Cedola media netta</th>
           </tr></thead>
           <tbody id="cf-cedole-tbody"></tbody>
+          <tfoot><tr class="tot-row">
+            <td style="text-align:left">TOTALE</td>
+            <td></td>
+            <td class="td-num" id="cf-ced-t-rn"></td>
+            <td class="td-num" id="cf-ced-t-n"></td>
+            <td class="td-num" id="cf-ced-t-media" title="Rendita totale ÷ numero totale di cedole"></td>
+          </tr></tfoot>
         </table>
       </div>
     </div>
@@ -1092,9 +1101,12 @@ function rdCFCedoleDetail(){
   tbody.innerHTML='';
   const overrideMesi=(D.cf&&D.cf.cedoleMesi)||{};
   const allT=[...TITOLI,...(D.customTitoli||[])].filter(t=>!D.esclusi[t.id]&&(t.cedola||0)>0);
+  let totRn=0,totN=0;
   allT.forEach(t=>{
     const mesi=overrideMesi[t.id]||t.mesiCedola||[];
     const c=calcT(t);
+    const nCed=mesi.length,media=nCed>0?c.rn/nCed:0;
+    totRn+=c.rn;totN+=nCed;
     const checks=MESI_S.map((ms,i)=>{
       const m=i+1,ck=mesi.includes(m)?'checked':'';
       return`<label style="cursor:pointer;display:inline-block;margin:0 4px 3px 0;white-space:nowrap">
@@ -1105,8 +1117,12 @@ function rdCFCedoleDetail(){
       <td style="font-weight:bold;font-size:12px;white-space:nowrap;max-width:190px;overflow:hidden;text-overflow:ellipsis" title="${t.nome}">${t.nome.split('—')[0].trim()}</td>
       <td style="font-size:11px;padding:6px 10px">${checks}</td>
       <td class="td-net">${eI(c.rn)}</td>
+      <td class="td-num">${nCed}</td>
+      <td class="td-num" style="font-weight:bold;color:var(--blu-md)">${nCed>0?eI(media):'—'}</td>
     </tr>`);
   });
+  const st=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
+  st('cf-ced-t-rn',eI(totRn));st('cf-ced-t-n',String(totN));st('cf-ced-t-media',totN>0?eI(totRn/totN):'—');
 }
 
 function cfToggleMese(id,m,checked){
