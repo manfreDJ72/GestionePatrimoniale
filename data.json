@@ -8,24 +8,24 @@
   "inflazione_ts": "2026-09-16T11:01:05.121Z",
   "prezzi": {
     "t2": 100.572,
-    "t3": 100.12,
-    "t4": 100.592
+    "t3": 100.21,
+    "t4": 100.628
   },
   "valMkt": {
     "t9": 100000,
     "t8": 48000,
-    "t10": 49020
+    "t10": 48890
   },
   "prezziPrec": {
     "t1": 94.11,
     "t2": 100.5821,
-    "t3": 100.09,
-    "t4": 100.5618
+    "t3": 100.1199,
+    "t4": 100.5878
   },
   "valMktPrec": {
-    "t10": 49000
+    "t10": 49022
   },
-  "tsAggiornamento": "16/09/2026, 13:01",
+  "tsAggiornamento": "16/09/2026, 22:26",
   "customTitoli": [],
   "esclusi": {},
   "apt": [
@@ -219,27 +219,27 @@
   "prezziUnit": {
     "t2": {
       "price": 100.572,
-      "date": "2026-09-15",
+      "date": "2026-09-16",
       "src": "borsaitaliana"
     },
     "t3": {
-      "price": 100.12,
-      "date": "2026-09-15",
+      "price": 100.21,
+      "date": "2026-09-16",
       "src": "borsaitaliana"
     },
     "t4": {
-      "price": 100.592,
-      "date": "2026-09-15",
+      "price": 100.628,
+      "date": "2026-09-16",
       "src": "borsaitaliana"
     },
     "t8": {
       "price": 960,
-      "date": "2026-09-15",
+      "date": "2026-09-16",
       "src": "borsaitaliana"
     },
     "t10": {
-      "price": 4.902,
-      "date": "2026-09-11",
+      "price": 4.889,
+      "date": "2026-09-14",
       "src": "borsaitaliana"
     }
   },
